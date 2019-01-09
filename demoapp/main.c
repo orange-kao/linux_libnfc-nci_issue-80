@@ -63,7 +63,7 @@ int LookForTag(char** args, int args_len, char* tag, char** data, int format);
 
 /********************************** CallBack **********************************/
 
-void onDeviceArrival (void)
+void onServerDeviceArrival (void)
 {
     printf("\tg_SnepServerCB.onDeviceArrival - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
@@ -105,7 +105,7 @@ void onDeviceArrival (void)
     framework_UnlockMutex(g_devLock);
 }
 
-void onDeviceDeparture (void)
+void onServerDeviceDeparture (void)
 {
     printf("\tg_SnepServerCB.onDeviceDeparture - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
@@ -171,7 +171,7 @@ void onDeviceDeparture (void)
     framework_UnlockMutex(g_SnepClientLock);
 }
 
-void onMessageReceived(unsigned char *message, unsigned int length)
+void onServerMessageReceived(unsigned char *message, unsigned int length)
 {
     printf("\tg_SnepServerCB.onMessageReceived - Line %d\n", __LINE__);
     unsigned int i = 0x00;
@@ -179,7 +179,7 @@ void onMessageReceived(unsigned char *message, unsigned int length)
     PrintNDEFContent(NULL, NULL, message, length);
 }
 
-void onSnepClientReady()
+void onClientDeviceArrival()
 {
     printf("\tg_SnepClientCB.onDeviceArrival - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
@@ -248,7 +248,7 @@ void onSnepClientReady()
     framework_UnlockMutex(g_SnepClientLock);
 }
 
-void onSnepClientClosed()
+void onClientDeviceDeparture()
 {
     printf("\tg_SnepClientCB.onDeviceDeparture - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
@@ -318,12 +318,12 @@ int InitMode(int tag, int p2p, int hce)
 {
     int res = 0x00;
 
-    g_SnepServerCB.onDeviceArrival = onDeviceArrival;
-    g_SnepServerCB.onDeviceDeparture = onDeviceDeparture;
-    g_SnepServerCB.onMessageReceived = onMessageReceived;
+    g_SnepServerCB.onDeviceArrival = onServerDeviceArrival;
+    g_SnepServerCB.onDeviceDeparture = onServerDeviceDeparture;
+    g_SnepServerCB.onMessageReceived = onServerMessageReceived;
 
-    g_SnepClientCB.onDeviceArrival = onSnepClientReady;
-    g_SnepClientCB.onDeviceDeparture = onSnepClientClosed;
+    g_SnepClientCB.onDeviceArrival = onClientDeviceArrival;
+    g_SnepClientCB.onDeviceDeparture = onClientDeviceDeparture;
 
     if(0x00 == res)
     {
@@ -387,6 +387,7 @@ int DeinitPollMode()
 
 int SnepPush(unsigned char* msgToPush, unsigned int len)
 {
+    printf("\tSnepPush - Line %d\n", __LINE__);
     int res = 0x00;
 
     framework_LockMutex(g_devLock);
