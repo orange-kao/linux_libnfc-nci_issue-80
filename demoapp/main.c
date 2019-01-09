@@ -210,7 +210,7 @@ void onHostCardEmulationActivated(unsigned char mode)
     
     if(eDevState_WAIT_ARRIVAL == g_DevState)
     {
-        printf("\tNFC Reader Found, mode=0x%.2x\n\n", mode);
+        printf("\tNFC Reader Found, mode=0x%.2x\n", mode);
         g_DevState = eDevState_PRESENT;
         g_Dev_Type = eDevType_READER;
         framework_NotifyMutex(g_devLock, 0);
@@ -240,14 +240,14 @@ void onHostCardEmulationDeactivated()
     
     if(eDevState_WAIT_DEPARTURE == g_DevState)
     {
-        printf("\tNFC Reader Lost\n\n");
+        printf("\tNFC Reader Lost\n");
         g_DevState = eDevState_DEPARTED;
         g_Dev_Type = eDevType_NONE;
         framework_NotifyMutex(g_devLock, 0);
     }
     else if(eDevState_PRESENT == g_DevState)
     {
-        printf("\tNFC Reader Lost\n\n");
+        printf("\tNFC Reader Lost\n");
         g_DevState = eDevState_DEPARTED;
         g_Dev_Type = eDevType_NONE;
     }
@@ -287,7 +287,7 @@ void onTagArrival(nfc_tag_info_t *pTagInfo)
     
     if(eDevState_WAIT_ARRIVAL == g_DevState)
     {    
-        printf("\tNFC Tag Found\n\n");
+        printf("\tNFC Tag Found\n");
         memcpy(&g_TagInfo, pTagInfo, sizeof(nfc_tag_info_t));
         g_DevState = eDevState_PRESENT;
         g_Dev_Type = eDevType_TAG;
@@ -320,7 +320,7 @@ void onTagDeparture(void)
     
     if(eDevState_WAIT_DEPARTURE == g_DevState)
     {
-        printf("\tNFC Tag Lost\n\n");
+        printf("\tNFC Tag Lost\n");
         g_DevState = eDevState_DEPARTED;
         g_Dev_Type = eDevType_NONE;
         framework_NotifyMutex(g_devLock, 0);
@@ -447,7 +447,7 @@ void onDeviceDeparture (void)
 void onMessageReceived(unsigned char *message, unsigned int length)
 {
     unsigned int i = 0x00;
-    printf("\n\t\tNDEF Message Received : \n");
+    printf("\t\tNDEF Message Received : \n");
     PrintNDEFContent(NULL, NULL, message, length);
 }
 void onSnepClientReady()
@@ -812,7 +812,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
                 if(0x00 <= res)
                 {
                     printf("\t\t\t\tType :                 'Text'\n");
-                    printf("\t\t\t\tText :                 '%s'\n\n", TextContent);
+                    printf("\t\t\t\tText :                 '%s'\n", TextContent);
                 }
                 else
                 {
@@ -833,7 +833,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
                 if(0x00 <= res)
                 {
                     printf("                Type :                 'URI'\n");
-                    printf("                URI :                 '%s'\n\n", URLContent);
+                    printf("                URI :                 '%s'\n", URLContent);
                     /*NOTE: open url in browser*/
                     /*open_uri(URLContent);*/
                 }
@@ -1061,7 +1061,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
                     } break;
                     case NDEF_TNF_MEDIA:
                     {
-                        printf("\n\t\tTNF Media\n\n");
+                        printf("\n\t\tTNF Media\n");
                         printf("\t\t\tType : ");
                         for(i = 0x00; i < NDEFContent[1]; i++)
                         {
@@ -1085,7 +1085,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
                     } break;
                     case NDEF_TNF_EXT:
                     {
-                        printf("\n\t\tTNF External\n\n");
+                        printf("\n\t\tTNF External\n");
                         printf("\t\t\tType : ");
                         for(i = 0x00; i < NDEFContent[1]; i++)
                         {
@@ -1120,7 +1120,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
             {
             } break;
         }
-        printf("\n\t\t%d bytes of NDEF data received :\n\t\t", ndefRawLen);
+        printf("\t\t%d bytes of NDEF data received :\n\t\t", ndefRawLen);
         for(i = 0x00; i < ndefRawLen; i++)
         {
             printf("%02X ", NDEFContent[i]);
@@ -1129,7 +1129,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
                 printf("\n\t\t");
             }
         }
-        printf("\n\n");
+        printf("\n");
     }
     
     if(NULL != NDEFContent)
@@ -1176,7 +1176,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
         
         else if(eDevState_PRESENT != g_DevState)
         {
-               if(tag_count == 0) printf("Waiting for a Tag/Device...\n\n");
+               if(tag_count == 0) printf("Waiting for a Tag/Device...\n");
             g_DevState = eDevState_WAIT_ARRIVAL;
             framework_WaitMutex(g_devLock, 0);
         }
@@ -1331,7 +1331,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                                 {
                                     printf("%02X ", MifareResp[i]);
                                 }
-                                printf("\n\n");
+                                printf("\n");
                             }
                         }
                     }
@@ -1356,7 +1356,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                             {
                                 printf("%02X ", MifareResp[i]);
                             }
-                            printf("\n\n");
+                            printf("\n");
                         }
                     }
                     else
@@ -1457,16 +1457,16 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                         framework_LockMutex(g_HCELock);
                         if(0x00 == res)
                         {
-                            printf("\n\n\t\tResponse sent : \n\t\t");
+                            printf("\n\t\tResponse sent : \n\t\t");
                             for(i = 0x00; i < HCEResponseLen; i++)
                             {
                                 printf("%02X ", HCEReponse[i]);
                             }
-                            printf("\n\n");
+                            printf("\n");
                         }
                         else
                         {
-                            printf("\n\n\t\tFailed to send response\n\n");
+                            printf("\n\t\tFailed to send response\n");
                         }
                     }
                     framework_LockMutex(g_devLock);
@@ -1485,13 +1485,13 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                 framework_WaitMutex(g_devLock, 0);
                 if(eDevType_P2P == DevTypeBck)
                 {
-                    printf("\tDevice Lost\n\n");
+                    printf("\tDevice Lost\n");
                 }
                 DevTypeBck = eDevType_NONE;
             }
             else if(eDevType_P2P == DevTypeBck)
             {
-                printf("\tDevice Lost\n\n");
+                printf("\tDevice Lost\n");
             }
         }
         
@@ -2012,7 +2012,7 @@ void cmd_write(int arg_len, char** arg)
 
 void* ExitThread(void* pContext)
 {
-    printf("                              ... press enter to quit ...\n\n");
+    printf("                              ... press enter to quit ...\n");
     
     getchar();
     
