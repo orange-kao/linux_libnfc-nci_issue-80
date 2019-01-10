@@ -65,7 +65,7 @@ int LookForTag(char** args, int args_len, char* tag, char** data, int format);
 
 void onServerDeviceArrival (void)
 {
-    printf("\tg_SnepServerCB.onDeviceArrival - Line %d\n", __LINE__);
+    printf("\tSNEP server - onDeviceArrival - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
 
     switch(g_DevState)
@@ -107,7 +107,7 @@ void onServerDeviceArrival (void)
 
 void onServerDeviceDeparture (void)
 {
-    printf("\tg_SnepServerCB.onDeviceDeparture - Line %d\n", __LINE__);
+    printf("\tSNEP server - onDeviceDeparture - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
 
     switch(g_DevState)
@@ -173,7 +173,7 @@ void onServerDeviceDeparture (void)
 
 void onServerMessageReceived(unsigned char *message, unsigned int length)
 {
-    printf("\tg_SnepServerCB.onMessageReceived - Line %d\n", __LINE__);
+    printf("\tSNEP server - onMessageReceived - Line %d\n", __LINE__);
     unsigned int i = 0x00;
     printf("\t\tNDEF Message Received : \n");
     PrintNDEFContent(NULL, NULL, message, length);
@@ -181,7 +181,7 @@ void onServerMessageReceived(unsigned char *message, unsigned int length)
 
 void onClientDeviceArrival()
 {
-    printf("\tg_SnepClientCB.onDeviceArrival - Line %d\n", __LINE__);
+    printf("\tSNEP client - onDeviceArrival - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
 
     switch(g_DevState)
@@ -250,7 +250,7 @@ void onClientDeviceArrival()
 
 void onClientDeviceDeparture()
 {
-    printf("\tg_SnepClientCB.onDeviceDeparture - Line %d\n", __LINE__);
+    printf("\tSNEP client - onDeviceDeparture - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
 
     switch(g_DevState)
@@ -348,7 +348,7 @@ int InitMode(int tag, int p2p, int hce)
 
     if(0x00 == res)
     {
-        nfcManager_enableDiscovery(DEFAULT_NFA_TECH_MASK, 0x00, hce, 0);
+        nfcManager_enableDiscovery(DEFAULT_NFA_TECH_MASK, 0x00, hce, 1);
         if(0x01 == p2p)
         {
             res = nfcSnep_startServer(&g_SnepServerCB);
@@ -393,7 +393,7 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     framework_LockMutex(g_devLock);
     framework_LockMutex(g_SnepClientLock);
 
-    if(eSnepClientState_READY != g_SnepClientState && eSnepClientState_EXIT!= g_SnepClientState && eDevState_PRESENT == g_DevState)
+    if(eSnepClientState_READY != g_SnepClientState && eSnepClientState_EXIT != g_SnepClientState && eDevState_PRESENT == g_DevState)
     {
         framework_UnlockMutex(g_devLock);
         g_SnepClientState = eSnepClientState_WAIT_READY;
