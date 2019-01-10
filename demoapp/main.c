@@ -66,7 +66,7 @@ int look_for_tag(char** args, int args_len, char* tag, char** data, int format);
 
 void on_server_device_arrival (void)
 {
-    printf("\tSNEP server - onDeviceArrival - Line %d\n", __LINE__);
+    printf("\tSNEP server - device arrival - Line %d\n", __LINE__);
 
     printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
     framework_LockMutex(global_dev_lock);
@@ -119,12 +119,12 @@ void on_server_device_arrival (void)
     framework_UnlockMutex(global_dev_lock);
     printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tSNEP server - onDeviceArrival return - Line %d\n", __LINE__);
+    printf("\tSNEP server - device arrival return - Line %d\n", __LINE__);
 }
 
 void on_server_device_departure (void)
 {
-    printf("\tSNEP server - onDeviceDeparture - Line %d\n", __LINE__);
+    printf("\tSNEP server - device departure - Line %d\n", __LINE__);
 
     printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
     framework_LockMutex(global_dev_lock);
@@ -206,12 +206,12 @@ void on_server_device_departure (void)
     framework_UnlockMutex(global_snep_client_lock);
     printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    printf("\tSNEP server - onDeviceDeparture return - Line %d\n", __LINE__);
+    printf("\tSNEP server - device departure return - Line %d\n", __LINE__);
 }
 
 void on_server_message_received(unsigned char *message, unsigned int length)
 {
-    printf("\tSNEP server - onMessageReceived - Line %d\n", __LINE__);
+    printf("\tSNEP server - message received - Line %d\n", __LINE__);
     unsigned int i = 0x00;
     printf("\t\tNDEF Message Received : \n");
     print_ndef_content(NULL, NULL, message, length);
@@ -219,7 +219,7 @@ void on_server_message_received(unsigned char *message, unsigned int length)
 
 void on_client_device_arrival()
 {
-    printf("\tSNEP client - onDeviceArrival - Line %d\n", __LINE__);
+    printf("\tSNEP client - device arrival - Line %d\n", __LINE__);
 
     printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
     framework_LockMutex(global_dev_lock);
@@ -305,12 +305,12 @@ void on_client_device_arrival()
     framework_UnlockMutex(global_snep_client_lock);
     printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    printf("\tSNEP client - onDeviceArrival return - Line %d\n", __LINE__);
+    printf("\tSNEP client - device arrival return - Line %d\n", __LINE__);
 }
 
 void on_client_device_departure()
 {
-    printf("\tSNEP client - onDeviceDeparture - Line %d\n", __LINE__);
+    printf("\tSNEP client - device departure - Line %d\n", __LINE__);
 
     printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
     framework_LockMutex(global_dev_lock);
@@ -391,7 +391,7 @@ void on_client_device_departure()
     framework_UnlockMutex(global_snep_client_lock);
     printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    printf("\tSNEP client - onDeviceDeparture return - Line %d\n", __LINE__);
+    printf("\tSNEP client - device departure return - Line %d\n", __LINE__);
 }
 
 int init_mode(int tag, int p2p, int hce, int snep_server, int snep_client)
