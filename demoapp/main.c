@@ -59,12 +59,12 @@ static nfcSnepServerCallback_t g_SnepServerCB;
 static nfcSnepClientCallback_t g_SnepClientCB;
 
 void help(int mode);
-int InitEnv();
-int LookForTag(char** args, int args_len, char* tag, char** data, int format);
+int init_env();
+int look_for_tag(char** args, int args_len, char* tag, char** data, int format);
 
 /********************************** CallBack **********************************/
 
-void onServerDeviceArrival (void)
+void on_server_device_arrival (void)
 {
     printf("\tSNEP server - onDeviceArrival - Line %d\n", __LINE__);
 
@@ -122,7 +122,7 @@ void onServerDeviceArrival (void)
     printf("\tSNEP server - onDeviceArrival return - Line %d\n", __LINE__);
 }
 
-void onServerDeviceDeparture (void)
+void on_server_device_departure (void)
 {
     printf("\tSNEP server - onDeviceDeparture - Line %d\n", __LINE__);
 
@@ -209,15 +209,15 @@ void onServerDeviceDeparture (void)
     printf("\tSNEP server - onDeviceDeparture return - Line %d\n", __LINE__);
 }
 
-void onServerMessageReceived(unsigned char *message, unsigned int length)
+void on_server_message_received(unsigned char *message, unsigned int length)
 {
     printf("\tSNEP server - onMessageReceived - Line %d\n", __LINE__);
     unsigned int i = 0x00;
     printf("\t\tNDEF Message Received : \n");
-    PrintNDEFContent(NULL, NULL, message, length);
+    print_ndef_content(NULL, NULL, message, length);
 }
 
-void onClientDeviceArrival()
+void on_client_device_arrival()
 {
     printf("\tSNEP client - onDeviceArrival - Line %d\n", __LINE__);
 
@@ -308,7 +308,7 @@ void onClientDeviceArrival()
     printf("\tSNEP client - onDeviceArrival return - Line %d\n", __LINE__);
 }
 
-void onClientDeviceDeparture()
+void on_client_device_departure()
 {
     printf("\tSNEP client - onDeviceDeparture - Line %d\n", __LINE__);
 
@@ -394,16 +394,16 @@ void onClientDeviceDeparture()
     printf("\tSNEP client - onDeviceDeparture return - Line %d\n", __LINE__);
 }
 
-int InitMode(int tag, int p2p, int hce)
+int init_mode(int tag, int p2p, int hce)
 {
     int res = 0x00;
 
-    g_SnepServerCB.onDeviceArrival = onServerDeviceArrival;
-    g_SnepServerCB.onDeviceDeparture = onServerDeviceDeparture;
-    g_SnepServerCB.onMessageReceived = onServerMessageReceived;
+    g_SnepServerCB.onDeviceArrival = on_server_device_arrival;
+    g_SnepServerCB.onDeviceDeparture = on_server_device_departure;
+    g_SnepServerCB.onMessageReceived = on_server_message_received;
 
-    g_SnepClientCB.onDeviceArrival = onClientDeviceArrival;
-    g_SnepClientCB.onDeviceDeparture = onClientDeviceDeparture;
+    g_SnepClientCB.onDeviceArrival = on_client_device_arrival;
+    g_SnepClientCB.onDeviceDeparture = on_client_device_departure;
 
     if(0x00 == res)
     {
@@ -442,7 +442,7 @@ int InitMode(int tag, int p2p, int hce)
     return res;
 }
 
-int DeinitPollMode()
+int deinit_poll_mode()
 {
     int res = 0x00;
 
@@ -465,9 +465,9 @@ int DeinitPollMode()
     return res;
 }
 
-int SnepPush(unsigned char* msgToPush, unsigned int len)
+int snep_push(unsigned char* msgToPush, unsigned int len)
 {
-    printf("\tSnepPush - Line %d\n", __LINE__);
+    printf("\tsnep_push - Line %d\n", __LINE__);
     int res = 0x00;
 
     printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
@@ -521,7 +521,7 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     return res;
 }
 
-void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned char* ndefRaw, unsigned int ndefRawLen)
+void print_ndef_content(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned char* ndefRaw, unsigned int ndefRawLen)
 {
     unsigned char* NDEFContent = NULL;
     nfc_friendly_type_t lNDEFType = NDEF_FRIENDLY_TYPE_OTHER;
@@ -897,7 +897,7 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
 }
 
 /* mode=1 => poll, mode=2 => push, mode=3 => write, mode=4 => HCE */
-int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
+int wait_device_arrival(int mode, unsigned char* msgToSend, unsigned int len)
 {
     DevType DevTypeBck = DEV_TYPE_NONE;
 
@@ -954,7 +954,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
 
                 if(2 == mode)
                 {
-                    SnepPush(msgToSend, len);
+                    snep_push(msgToSend, len);
                 }
 
                 printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
@@ -1018,7 +1018,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
     return 0;
 }
 
-void strtolower(char * string)
+void str_to_lower(char * string)
 {
     unsigned int i = 0x00;
 
@@ -1028,7 +1028,7 @@ void strtolower(char * string)
     }
 }
 
-char* strRemovceChar(const char* str, char car)
+char* str_removce_char(const char* str, char car)
 {
     unsigned int i = 0x00;
     unsigned int index = 0x00;
@@ -1045,7 +1045,7 @@ char* strRemovceChar(const char* str, char car)
     return dest;
 }
 
-int convertParamtoBuffer(char* param, unsigned char** outBuffer, unsigned int* outBufferLen)
+int convert_param_to_buffer(char* param, unsigned char** outBuffer, unsigned int* outBufferLen)
 {
     int res = 0x00;
     unsigned int i = 0x00;
@@ -1061,7 +1061,7 @@ int convertParamtoBuffer(char* param, unsigned char** outBuffer, unsigned int* o
 
     if(0x00 == res)
     {
-        param = strRemovceChar(param, ' ');
+        param = str_removce_char(param, ' ');
     }
 
     if(0x00 == res)
@@ -1096,7 +1096,7 @@ int convertParamtoBuffer(char* param, unsigned char** outBuffer, unsigned int* o
     return res;
 }
 
-int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, unsigned int* outNDEFBufferLen)
+int build_ndef_message(int arg_len, char** arg, unsigned char** outNDEFBuffer, unsigned int* outNDEFBufferLen)
 {
     int res = 0x00;
     nfc_handover_cps_t cps = HANDOVER_CPS_UNKNOWN;
@@ -1112,7 +1112,7 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
     char* carrier_name = NULL;
     char* carrier_data = NULL;
 
-    if(0xFF == LookForTag(arg, arg_len, "-t", &type, 0x00) && 0xFF == LookForTag(arg, arg_len, "--type", &type, 0x01))
+    if(0xFF == look_for_tag(arg, arg_len, "-t", &type, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--type", &type, 0x01))
     {
         res = 0xFF;
         printf("Record type missing (-t)\n");
@@ -1120,10 +1120,10 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
     }
     if(0x00 == res)
     {
-        strtolower(type);
+        str_to_lower(type);
         if(0x00 == strcmp(type, "uri"))
         {
-            if(0x00 == LookForTag(arg, arg_len, "-u", &uri, 0x00) || 0x00 == LookForTag(arg, arg_len, "--uri", &uri, 0x01))
+            if(0x00 == look_for_tag(arg, arg_len, "-u", &uri, 0x00) || 0x00 == look_for_tag(arg, arg_len, "--uri", &uri, 0x01))
             {
                 *outNDEFBufferLen = strlen(uri) + 30; /*TODO : replace 30 by URI NDEF message header*/
                 *outNDEFBuffer = (unsigned char*) malloc(*outNDEFBufferLen * sizeof(unsigned char));
@@ -1147,13 +1147,13 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
         }
         else if(0x00 == strcmp(type, "text"))
         {
-            if(0xFF == LookForTag(arg, arg_len, "-r", &text, 0x00) && 0xFF == LookForTag(arg, arg_len, "--rep", &text, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-r", &text, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--rep", &text, 0x01))
             {
                 printf("Representation missing (-r)\n");
                 res = 0xFF;
             }
 
-            if(0xFF == LookForTag(arg, arg_len, "-l", &lang, 0x00) && 0xFF == LookForTag(arg, arg_len, "--lang", &lang, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-l", &lang, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--lang", &lang, 0x01))
             {
                 printf("Language missing (-l)\n");
                 res = 0xFF;
@@ -1180,12 +1180,12 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
         }
         else if(0x00 == strcmp(type, "mime"))
         {
-            if(0xFF == LookForTag(arg, arg_len, "-m", &mime_type, 0x00) && 0xFF == LookForTag(arg, arg_len, "--mime", &mime_type, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-m", &mime_type, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--mime", &mime_type, 0x01))
             {
                 printf("Mime-type missing (-m)\n");
                 res = 0xFF;
             }
-            if(0xFF == LookForTag(arg, arg_len, "-d", &mime_data, 0x00) && 0xFF == LookForTag(arg, arg_len, "--data", &mime_data, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-d", &mime_data, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--data", &mime_data, 0x01))
             {
                 printf("NDEF Data missing (-d)\n");
                 res = 0xFF;
@@ -1195,7 +1195,7 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
                 *outNDEFBufferLen = strlen(mime_data) +  strlen(mime_type) + 30; /*TODO : replace 30 by MIME NDEF message header*/
                 *outNDEFBuffer = (unsigned char*) malloc(*outNDEFBufferLen * sizeof(unsigned char));
 
-                res = convertParamtoBuffer(mime_data, &ndef_msg, &ndef_msg_len);
+                res = convert_param_to_buffer(mime_data, &ndef_msg, &ndef_msg_len);
 
                 if(0x00 == res)
                 {
@@ -1219,18 +1219,18 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
         else if(0x00 == strcmp(type, "hs"))
         {
 
-            if(0xFF == LookForTag(arg, arg_len, "-cs", &carrier_state, 0x00) && 0xFF == LookForTag(arg, arg_len, "--carrierState", &carrier_state, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-cs", &carrier_state, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--carrierState", &carrier_state, 0x01))
             {
                 printf("Carrier Power State missing (-cs)\n");
                 res = 0xFF;
             }
-            if(0xFF == LookForTag(arg, arg_len, "-cn", &carrier_name, 0x00) && 0xFF == LookForTag(arg, arg_len, "--carrierName", &carrier_name, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-cn", &carrier_name, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--carrierName", &carrier_name, 0x01))
             {
                 printf("Carrier Reference Name missing (-cn)\n");
                 res = 0xFF;
             }
 
-            if(0xFF == LookForTag(arg, arg_len, "-d", &carrier_data, 0x00) && 0xFF == LookForTag(arg, arg_len, "--data", &carrier_data, 0x01))
+            if(0xFF == look_for_tag(arg, arg_len, "-d", &carrier_data, 0x00) && 0xFF == look_for_tag(arg, arg_len, "--data", &carrier_data, 0x01))
             {
                 printf("NDEF Data missing (-d)\n");
                 res = 0xFF;
@@ -1241,7 +1241,7 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
                 *outNDEFBufferLen = strlen(carrier_name) + strlen(carrier_data) + 30;  /*TODO : replace 30 by HS NDEF message header*/
                 *outNDEFBuffer = (unsigned char*) malloc(*outNDEFBufferLen * sizeof(unsigned char));
 
-                strtolower(carrier_state);
+                str_to_lower(carrier_state);
 
                 if(0x00 == strcmp(carrier_state, "inactive"))
                 {
@@ -1263,7 +1263,7 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
 
                 if(0x00 == res)
                 {
-                    res = convertParamtoBuffer(carrier_data, &ndef_msg, &ndef_msg_len);
+                    res = convert_param_to_buffer(carrier_data, &ndef_msg, &ndef_msg_len);
                 }
 
                 if(0x00 == res)
@@ -1304,7 +1304,7 @@ int BuildNDEFMessage(int arg_len, char** arg, unsigned char** outNDEFBuffer, uns
 
 /* if data = NULL this tag is not followed by dataStr : for example -h --help
 if format = 0 tag format -t "text" if format=1 tag format : --type=text */
-int LookForTag(char** args, int args_len, char* tag, char** data, int format)
+int look_for_tag(char** args, int args_len, char* tag, char** data, int format)
 {
     int res = 0xFF;
     int i = 0x00;
@@ -1313,7 +1313,7 @@ int LookForTag(char** args, int args_len, char* tag, char** data, int format)
     for(i = 0x00; i < args_len; i++)
     {
         found = 0xFF;
-        strtolower(args[i]);
+        str_to_lower(args[i]);
         if(0x00 == format)
         {
             found = strcmp(args[i], tag);
@@ -1368,21 +1368,21 @@ void cmd_poll(int arg_len, char** arg)
     printf("##             Poll mode activated             ##\n");
     printf("#################################################\n");
 
-    InitEnv();
-    if(0x00 == LookForTag(arg, arg_len, "-h", NULL, 0x00) || 0x00 == LookForTag(arg, arg_len, "--help", NULL, 0x01))
+    init_env();
+    if(0x00 == look_for_tag(arg, arg_len, "-h", NULL, 0x00) || 0x00 == look_for_tag(arg, arg_len, "--help", NULL, 0x01))
     {
         help(0x01);
     }
     else
     {
-        res = InitMode(0x00, 0x01, 0x00);
+        res = init_mode(0x00, 0x01, 0x00);
 
         if(0x00 == res)
         {
-            WaitDeviceArrival(0x01, NULL , 0x00);
+            wait_device_arrival(0x01, NULL , 0x00);
         }
 
-        res = DeinitPollMode();
+        res = deinit_poll_mode();
     }
 
     printf("Leaving ...\n");
@@ -1400,24 +1400,24 @@ void cmd_push(int arg_len, char** arg)
     printf("##             Push mode activated             ##\n");
     printf("#################################################\n");
 
-    InitEnv();
+    init_env();
 
-    if(0x00 == LookForTag(arg, arg_len, "-h", NULL, 0x00) || 0x00 == LookForTag(arg, arg_len, "--help", NULL, 0x01))
+    if(0x00 == look_for_tag(arg, arg_len, "-h", NULL, 0x00) || 0x00 == look_for_tag(arg, arg_len, "--help", NULL, 0x01))
     {
         help(0x02);
     }
     else
     {
-        res = InitMode(0x00, 0x01, 0x00);
+        res = init_mode(0x00, 0x01, 0x00);
 
         if(0x00 == res)
         {
-            res = BuildNDEFMessage(arg_len, arg, &NDEFMsg, &NDEFMsgLen);
+            res = build_ndef_message(arg_len, arg, &NDEFMsg, &NDEFMsgLen);
         }
 
         if(0x00 == res)
         {
-            WaitDeviceArrival(0x02, NDEFMsg, NDEFMsgLen);
+            wait_device_arrival(0x02, NDEFMsg, NDEFMsgLen);
         }
 
         if(NULL != NDEFMsg)
@@ -1427,13 +1427,13 @@ void cmd_push(int arg_len, char** arg)
             NDEFMsgLen = 0x00;
         }
 
-        res = DeinitPollMode();
+        res = deinit_poll_mode();
     }
 
     printf("Leaving ...\n");
 }
 
-void* ExitThread(void* pContext)
+void* exit_thread(void* pContext)
 {
     printf("                              ... press enter to quit ...\n");
 
@@ -1476,7 +1476,7 @@ void* ExitThread(void* pContext)
     return NULL;
 }
 
-int InitEnv()
+int init_env()
 {
     eResult tool_res = FRAMEWORK_SUCCESS;
     int res = 0x00;
@@ -1498,7 +1498,7 @@ int InitEnv()
 
     if(0x00 == res)
     {
-        tool_res = framework_CreateThread(&global_thread_handle, ExitThread, NULL);
+        tool_res = framework_CreateThread(&global_thread_handle, exit_thread, NULL);
         if(FRAMEWORK_SUCCESS != tool_res)
         {
             res = 0xFF;
@@ -1507,7 +1507,7 @@ int InitEnv()
     return res;
 }
 
-int CleanEnv()
+int clean_env()
 {
     if(NULL != global_thread_handle)
     {
@@ -1551,7 +1551,7 @@ int main(int argc, char ** argv)
     }
     printf("\n");
 
-    CleanEnv();
+    clean_env();
 
     return 0;
 }
