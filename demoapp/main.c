@@ -50,7 +50,6 @@ typedef enum eDevType
 static void* g_ThreadHandle = NULL;
 static void* g_devLock = NULL;
 static void* g_SnepClientLock = NULL;
-static void* g_HCELock = NULL;
 static eDevState g_DevState = eDevState_NONE;
 static eDevType g_Dev_Type = eDevType_NONE;
 static eSnepClientState g_SnepClientState = eSnepClientState_OFF;
@@ -1374,15 +1373,7 @@ int InitEnv()
         }
      }
 
-     if(0x00 == res)
-    {
-        tool_res = framework_CreateMutex(&g_HCELock);
-        if(FRAMEWORK_SUCCESS != tool_res)
-        {
-            res = 0xFF;
-        }
-     }
-     if(0x00 == res)
+    if(0x00 == res)
     {
         tool_res = framework_CreateThread(&g_ThreadHandle, ExitThread, NULL);
         if(FRAMEWORK_SUCCESS != tool_res)
@@ -1412,11 +1403,6 @@ int CleanEnv()
     {
         framework_DeleteMutex(g_SnepClientLock);
         g_SnepClientLock = NULL;
-    }
-    if(NULL != g_HCELock)
-    {
-        framework_DeleteMutex(g_HCELock);
-        g_HCELock = NULL;
     }
     return 0x00;
 }
