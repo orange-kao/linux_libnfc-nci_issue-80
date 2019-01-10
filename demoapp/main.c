@@ -1379,7 +1379,7 @@ void cmd_poll(int arg_len, char** arg)
     }
     else
     {
-        res = init_mode(0x00, 0x01, 0x00, 1, 1);
+        res = init_mode(0x00, 0x01, 0x00, 1, 0);
 
         if(0x00 == res)
         {
@@ -1412,7 +1412,7 @@ void cmd_push(int arg_len, char** arg)
     }
     else
     {
-        res = init_mode(0x00, 0x01, 0x00, 1, 1);
+        res = init_mode(0x00, 0x01, 0x00, 0, 1);
 
         if(0x00 == res)
         {
