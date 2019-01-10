@@ -67,7 +67,10 @@ int LookForTag(char** args, int args_len, char* tag, char** data, int format);
 void onServerDeviceArrival (void)
 {
     printf("\tSNEP server - onDeviceArrival - Line %d\n", __LINE__);
+
+    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
+    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
     switch(g_DevState)
     {
@@ -106,12 +109,16 @@ void onServerDeviceArrival (void)
     }
 
     framework_UnlockMutex(g_devLock);
+    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 }
 
 void onServerDeviceDeparture (void)
 {
     printf("\tSNEP server - onDeviceDeparture - Line %d\n", __LINE__);
+
+    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
+    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
     switch(g_DevState)
     {
@@ -145,8 +152,11 @@ void onServerDeviceDeparture (void)
         } break;
     }
     framework_UnlockMutex(g_devLock);
+    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
     framework_LockMutex(g_SnepClientLock);
+    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
 
     switch(g_SnepClientState)
     {
@@ -175,6 +185,7 @@ void onServerDeviceDeparture (void)
     }
 
     framework_UnlockMutex(g_SnepClientLock);
+    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
 }
 
 void onServerMessageReceived(unsigned char *message, unsigned int length)
@@ -188,7 +199,10 @@ void onServerMessageReceived(unsigned char *message, unsigned int length)
 void onClientDeviceArrival()
 {
     printf("\tSNEP client - onDeviceArrival - Line %d\n", __LINE__);
+
+    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
+    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
     switch(g_DevState)
     {
@@ -226,8 +240,11 @@ void onClientDeviceArrival()
         } break;
     }
     framework_UnlockMutex(g_devLock);
+    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
     framework_LockMutex(g_SnepClientLock);
+    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
 
     switch(g_SnepClientState)
     {
@@ -256,12 +273,16 @@ void onClientDeviceArrival()
     }
 
     framework_UnlockMutex(g_SnepClientLock);
+    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
 }
 
 void onClientDeviceDeparture()
 {
     printf("\tSNEP client - onDeviceDeparture - Line %d\n", __LINE__);
+
+    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
+    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
     switch(g_DevState)
     {
@@ -295,8 +316,11 @@ void onClientDeviceDeparture()
         } break;
     }
     framework_UnlockMutex(g_devLock);
+    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
     framework_LockMutex(g_SnepClientLock);
+    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
 
     switch(g_SnepClientState)
     {
@@ -325,6 +349,7 @@ void onClientDeviceDeparture()
     }
 
     framework_UnlockMutex(g_SnepClientLock);
+    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
 }
 
 int InitMode(int tag, int p2p, int hce)
@@ -403,13 +428,21 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     printf("\tSnepPush - Line %d\n", __LINE__);
     int res = 0x00;
 
+    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
+    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+
+    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
     framework_LockMutex(g_SnepClientLock);
+    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
 
     if(eSnepClientState_READY != g_SnepClientState && eSnepClientState_EXIT != g_SnepClientState && eDevState_PRESENT == g_DevState)
     {
         framework_UnlockMutex(g_devLock);
+        printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+
         g_SnepClientState = eSnepClientState_WAIT_READY;
+
         printf("\tMutex wait - g_SnepClientLock - Line %d\n", __LINE__);
         framework_WaitMutex(g_SnepClientLock, 0);
         printf("\tMutex pass - g_SnepClientLock - Line %d\n", __LINE__);
@@ -417,11 +450,14 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     else
     {
         framework_UnlockMutex(g_devLock);
+        printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
     }
 
     if(eSnepClientState_READY == g_SnepClientState)
     {
         framework_UnlockMutex(g_SnepClientLock);
+        printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+
         res = nfcSnep_putMessage(msgToPush, len);
 
         if(0x00 != res)
@@ -436,6 +472,7 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     else
     {
         framework_UnlockMutex(g_SnepClientLock);
+        printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
     }
 
     return res;
@@ -825,9 +862,9 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
     {
         printf("do loop first line\n");
 
-        printf("\tLine %d\n", __LINE__);
+        printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
         framework_LockMutex(g_devLock);
-        printf("\tLine %d\n", __LINE__);
+        printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
         printf("\tg_DevState: %d\n", g_DevState);
 
@@ -836,6 +873,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
         {
             printf("\teDevState_EXIT == g_DevState\n");
             framework_UnlockMutex(g_devLock);
+            printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
             break;
         }
         else if(eDevState_PRESENT != g_DevState)
@@ -852,6 +890,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
         {
             printf("\teDevState_EXIT == g_DevState\n");
             framework_UnlockMutex(g_devLock);
+            printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
             break;
         }
 
@@ -862,7 +901,10 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
             if(eDevType_P2P == g_Dev_Type)/*P2P Detected*/
             {
                 printf("\teDevType_P2P == g_Dev_Type\n");
+
                 framework_UnlockMutex(g_devLock);
+                printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+
                 printf("\tDevice Found\n");
 
                 if(2 == mode)
@@ -870,7 +912,9 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                     SnepPush(msgToSend, len);
                 }
 
+                printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
                 framework_LockMutex(g_SnepClientLock);
+                printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
 
                 if(eSnepClientState_READY == g_SnepClientState)
                 {
@@ -883,14 +927,17 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
 
                 printf("\tLine %d\n", __LINE__);
                 framework_UnlockMutex(g_SnepClientLock);
-                printf("\tLine %d\n", __LINE__);
+                printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+
+                printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
                 framework_LockMutex(g_devLock);
-                printf("\tLine %d\n", __LINE__);
+                printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
             }
             else
             {
                 framework_UnlockMutex(g_devLock);
+                printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
                 break;
             }
 
@@ -915,6 +962,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
         }
 
         framework_UnlockMutex(g_devLock);
+        printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
     }while(0x01);
     printf("\tdo loop break\n");
 
@@ -1342,7 +1390,9 @@ void* ExitThread(void* pContext)
 
     getchar();
 
+    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
     framework_LockMutex(g_SnepClientLock);
+    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
 
     if(eSnepClientState_WAIT_OFF == g_SnepClientState || eSnepClientState_WAIT_READY == g_SnepClientState)
     {
@@ -1355,8 +1405,11 @@ void* ExitThread(void* pContext)
         g_SnepClientState = eSnepClientState_EXIT;
     }
     framework_UnlockMutex(g_SnepClientLock);
+    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
 
+    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
     framework_LockMutex(g_devLock);
+    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
     if(eDevState_WAIT_ARRIVAL == g_DevState || eDevState_WAIT_DEPARTURE == g_DevState)
     {
@@ -1370,6 +1423,7 @@ void* ExitThread(void* pContext)
     }
 
     framework_UnlockMutex(g_devLock);
+    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
     return NULL;
 }
 
