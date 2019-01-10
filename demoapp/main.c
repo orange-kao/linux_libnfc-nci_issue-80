@@ -79,37 +79,37 @@ void on_server_device_arrival (void)
     switch(global_dev_state)
     {
         case DEV_STATE_WAIT_DEPARTURE:
-        {
-            global_dev_state = DEV_STATE_PRESENT;
-            global_dev_type = DEV_TYPE_P2P;
-            framework_NotifyMutex(global_dev_lock, 0);
-            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_dev_state = DEV_STATE_PRESENT;
+                global_dev_type = DEV_TYPE_P2P;
+                framework_NotifyMutex(global_dev_lock, 0);
+                printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
+            } break;
         case DEV_STATE_EXIT:
-        {
-            global_dev_type = DEV_TYPE_P2P;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_P2P;
+            } break;
         case DEV_STATE_NONE:
-        {
-            global_dev_state = DEV_STATE_PRESENT;
-            global_dev_type = DEV_TYPE_P2P;
-        } break;
+            {
+                global_dev_state = DEV_STATE_PRESENT;
+                global_dev_type = DEV_TYPE_P2P;
+            } break;
         case DEV_STATE_WAIT_ARRIVAL:
-        {
-            global_dev_state = DEV_STATE_PRESENT;
-            global_dev_type = DEV_TYPE_P2P;
-            framework_NotifyMutex(global_dev_lock, 0);
-            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_dev_state = DEV_STATE_PRESENT;
+                global_dev_type = DEV_TYPE_P2P;
+                framework_NotifyMutex(global_dev_lock, 0);
+                printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
+            } break;
         case DEV_STATE_PRESENT:
-        {
-            global_dev_type = DEV_TYPE_P2P;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_P2P;
+            } break;
         case DEV_STATE_DEPARTED:
-        {
-            global_dev_type = DEV_TYPE_P2P;
-            global_dev_state = DEV_STATE_PRESENT;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_P2P;
+                global_dev_state = DEV_STATE_PRESENT;
+            } break;
     }
 
     printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
@@ -137,33 +137,33 @@ void on_server_device_departure (void)
     switch(global_dev_state)
     {
         case DEV_STATE_WAIT_DEPARTURE:
-        {
-            global_dev_state = DEV_STATE_DEPARTED;
-            global_dev_type = DEV_TYPE_NONE;
-            framework_NotifyMutex(global_dev_lock, 0);
-            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_dev_state = DEV_STATE_DEPARTED;
+                global_dev_type = DEV_TYPE_NONE;
+                framework_NotifyMutex(global_dev_lock, 0);
+                printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
+            } break;
         case DEV_STATE_EXIT:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
         case DEV_STATE_NONE:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
         case DEV_STATE_WAIT_ARRIVAL:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
         case DEV_STATE_PRESENT:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-            global_dev_state = DEV_STATE_DEPARTED;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+                global_dev_state = DEV_STATE_DEPARTED;
+            } break;
         case DEV_STATE_DEPARTED:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
     }
 
     printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
@@ -180,27 +180,27 @@ void on_server_device_departure (void)
     switch(global_snep_client_state)
     {
         case SNEP_CLIENT_STATE_WAIT_OFF:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
-            framework_NotifyMutex(global_snep_client_lock, 0);
-            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+                framework_NotifyMutex(global_snep_client_lock, 0);
+                printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
+            } break;
         case SNEP_CLIENT_STATE_OFF:
-        {
-        } break;
+            {
+            } break;
         case SNEP_CLIENT_STATE_WAIT_READY:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
-            framework_NotifyMutex(global_snep_client_lock, 0);
-            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+                framework_NotifyMutex(global_snep_client_lock, 0);
+                printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
+            } break;
         case SNEP_CLIENT_STATE_READY:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+            } break;
         case SNEP_CLIENT_STATE_EXIT:
-        {
-        } break;
+            {
+            } break;
     }
 
     framework_UnlockMutex(global_snep_client_lock);
@@ -232,37 +232,37 @@ void on_client_device_arrival()
     switch(global_dev_state)
     {
         case DEV_STATE_WAIT_DEPARTURE:
-        {
-            global_dev_state = DEV_STATE_PRESENT;
-            global_dev_type = DEV_TYPE_P2P;
-            framework_NotifyMutex(global_dev_lock, 0);
-            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_dev_state = DEV_STATE_PRESENT;
+                global_dev_type = DEV_TYPE_P2P;
+                framework_NotifyMutex(global_dev_lock, 0);
+                printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
+            } break;
         case DEV_STATE_EXIT:
-        {
-            global_dev_type = DEV_TYPE_P2P;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_P2P;
+            } break;
         case DEV_STATE_NONE:
-        {
-            global_dev_state = DEV_STATE_PRESENT;
-            global_dev_type = DEV_TYPE_P2P;
-        } break;
+            {
+                global_dev_state = DEV_STATE_PRESENT;
+                global_dev_type = DEV_TYPE_P2P;
+            } break;
         case DEV_STATE_WAIT_ARRIVAL:
-        {
-            global_dev_state = DEV_STATE_PRESENT;
-            global_dev_type = DEV_TYPE_P2P;
-            framework_NotifyMutex(global_dev_lock, 0);
-            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_dev_state = DEV_STATE_PRESENT;
+                global_dev_type = DEV_TYPE_P2P;
+                framework_NotifyMutex(global_dev_lock, 0);
+                printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
+            } break;
         case DEV_STATE_PRESENT:
-        {
-            global_dev_type = DEV_TYPE_P2P;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_P2P;
+            } break;
         case DEV_STATE_DEPARTED:
-        {
-            global_dev_type = DEV_TYPE_P2P;
-            global_dev_state = DEV_STATE_PRESENT;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_P2P;
+                global_dev_state = DEV_STATE_PRESENT;
+            } break;
     }
 
     printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
@@ -279,27 +279,27 @@ void on_client_device_arrival()
     switch(global_snep_client_state)
     {
         case SNEP_CLIENT_STATE_WAIT_OFF:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_READY;
-            framework_NotifyMutex(global_snep_client_lock, 0);
-            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_READY;
+                framework_NotifyMutex(global_snep_client_lock, 0);
+                printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
+            } break;
         case SNEP_CLIENT_STATE_OFF:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_READY;
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_READY;
+            } break;
         case SNEP_CLIENT_STATE_WAIT_READY:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_READY;
-            framework_NotifyMutex(global_snep_client_lock, 0);
-            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_READY;
+                framework_NotifyMutex(global_snep_client_lock, 0);
+                printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
+            } break;
         case SNEP_CLIENT_STATE_READY:
-        {
-        } break;
+            {
+            } break;
         case SNEP_CLIENT_STATE_EXIT:
-        {
-        } break;
+            {
+            } break;
     }
 
     framework_UnlockMutex(global_snep_client_lock);
@@ -323,33 +323,33 @@ void on_client_device_departure()
     switch(global_dev_state)
     {
         case DEV_STATE_WAIT_DEPARTURE:
-        {
-            global_dev_state = DEV_STATE_DEPARTED;
-            global_dev_type = DEV_TYPE_NONE;
-            framework_NotifyMutex(global_dev_lock, 0);
-            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_dev_state = DEV_STATE_DEPARTED;
+                global_dev_type = DEV_TYPE_NONE;
+                framework_NotifyMutex(global_dev_lock, 0);
+                printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
+            } break;
         case DEV_STATE_EXIT:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
         case DEV_STATE_NONE:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
         case DEV_STATE_WAIT_ARRIVAL:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
         case DEV_STATE_PRESENT:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-            global_dev_state = DEV_STATE_DEPARTED;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+                global_dev_state = DEV_STATE_DEPARTED;
+            } break;
         case DEV_STATE_DEPARTED:
-        {
-            global_dev_type = DEV_TYPE_NONE;
-        } break;
+            {
+                global_dev_type = DEV_TYPE_NONE;
+            } break;
     }
     printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
@@ -365,27 +365,27 @@ void on_client_device_departure()
     switch(global_snep_client_state)
     {
         case SNEP_CLIENT_STATE_WAIT_OFF:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
-            framework_NotifyMutex(global_snep_client_lock, 0);
-            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+                framework_NotifyMutex(global_snep_client_lock, 0);
+                printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
+            } break;
         case SNEP_CLIENT_STATE_OFF:
-        {
-        } break;
+            {
+            } break;
         case SNEP_CLIENT_STATE_WAIT_READY:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
-            framework_NotifyMutex(global_snep_client_lock, 0);
-            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+                framework_NotifyMutex(global_snep_client_lock, 0);
+                printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
+            } break;
         case SNEP_CLIENT_STATE_READY:
-        {
-            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
-        } break;
+            {
+                global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+            } break;
         case SNEP_CLIENT_STATE_EXIT:
-        {
-        } break;
+            {
+            } break;
     }
 
     framework_UnlockMutex(global_snep_client_lock);
@@ -565,317 +565,317 @@ void print_ndef_content(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned
         switch(lNDEFType)
         {
             case NDEF_FRIENDLY_TYPE_TEXT:
-            {
-                TextContent = malloc(res * sizeof(char));
-                res = ndef_readText(NDEFContent, res, TextContent, res);
-                if(0x00 <= res)
                 {
-                    printf("\t\t\t\tType :                 'Text'\n");
-                    printf("\t\t\t\tText :                 '%s'\n", TextContent);
-                }
-                else
-                {
-                    printf("\t\t\t\tRead NDEF Text Error\n");
-                }
-                if(NULL != TextContent)
-                {
-                    free(TextContent);
-                    TextContent = NULL;
-                }
-            } break;
+                    TextContent = malloc(res * sizeof(char));
+                    res = ndef_readText(NDEFContent, res, TextContent, res);
+                    if(0x00 <= res)
+                    {
+                        printf("\t\t\t\tType :                 'Text'\n");
+                        printf("\t\t\t\tText :                 '%s'\n", TextContent);
+                    }
+                    else
+                    {
+                        printf("\t\t\t\tRead NDEF Text Error\n");
+                    }
+                    if(NULL != TextContent)
+                    {
+                        free(TextContent);
+                        TextContent = NULL;
+                    }
+                } break;
             case NDEF_FRIENDLY_TYPE_URL:
-            {
-                /*NOTE : + 27 = Max prefix lenght*/
-                URLContent = malloc(res * sizeof(unsigned char) + 27 );
-                memset(URLContent, 0x00, res * sizeof(unsigned char) + 27);
-                res = ndef_readUrl(NDEFContent, res, URLContent, res + 27);
-                if(0x00 <= res)
                 {
-                    printf("                Type :                 'URI'\n");
-                    printf("                URI :                 '%s'\n", URLContent);
-                }
-                else
-                {
-                    printf("                Read NDEF URL Error\n");
-                }
-                if(NULL != URLContent)
-                {
-                    free(URLContent);
-                    URLContent = NULL;
-                }
-            } break;
+                    /*NOTE : + 27 = Max prefix lenght*/
+                    URLContent = malloc(res * sizeof(unsigned char) + 27 );
+                    memset(URLContent, 0x00, res * sizeof(unsigned char) + 27);
+                    res = ndef_readUrl(NDEFContent, res, URLContent, res + 27);
+                    if(0x00 <= res)
+                    {
+                        printf("                Type :                 'URI'\n");
+                        printf("                URI :                 '%s'\n", URLContent);
+                    }
+                    else
+                    {
+                        printf("                Read NDEF URL Error\n");
+                    }
+                    if(NULL != URLContent)
+                    {
+                        free(URLContent);
+                        URLContent = NULL;
+                    }
+                } break;
             case NDEF_FRIENDLY_TYPE_HS:
-            {
-                res = ndef_readHandoverSelectInfo(NDEFContent, res, &HandoverSelectContent);
-                if(0x00 <= res)
                 {
-                    printf("\n\t\tHandover Select : \n");
+                    res = ndef_readHandoverSelectInfo(NDEFContent, res, &HandoverSelectContent);
+                    if(0x00 <= res)
+                    {
+                        printf("\n\t\tHandover Select : \n");
 
-                    printf("\t\tBluetooth : \n\t\t\t\tPower state : ");
-                    switch(HandoverSelectContent.bluetooth.power_state)
-                    {
-                        case HANDOVER_CPS_INACTIVE:
+                        printf("\t\tBluetooth : \n\t\t\t\tPower state : ");
+                        switch(HandoverSelectContent.bluetooth.power_state)
                         {
-                            printf(" 'Inactive'\n");
-                        } break;
-                        case HANDOVER_CPS_ACTIVE:
+                            case HANDOVER_CPS_INACTIVE:
+                                {
+                                    printf(" 'Inactive'\n");
+                                } break;
+                            case HANDOVER_CPS_ACTIVE:
+                                {
+                                    printf(" 'Active'\n");
+                                } break;
+                            case HANDOVER_CPS_ACTIVATING:
+                                {
+                                    printf(" 'Activating'\n");
+                                } break;
+                            case HANDOVER_CPS_UNKNOWN:
+                                {
+                                    printf(" 'Unknown'\n");
+                                } break;
+                            default:
+                                {
+                                    printf(" 'Unknown'\n");
+                                } break;
+                        }
+                        if(HANDOVER_TYPE_BT == HandoverSelectContent.bluetooth.type)
                         {
-                            printf(" 'Active'\n");
-                        } break;
-                        case HANDOVER_CPS_ACTIVATING:
+                            printf("\t\t\t\tType :         'BT'\n");
+                        }
+                        else if(HANDOVER_TYPE_BLE == HandoverSelectContent.bluetooth.type)
                         {
-                            printf(" 'Activating'\n");
-                        } break;
-                        case HANDOVER_CPS_UNKNOWN:
+                            printf("\t\t\t\tType :         'BLE'\n");
+                        }
+                        else
                         {
-                            printf(" 'Unknown'\n");
-                        } break;
-                        default:
+                            printf("\t\t\t\tType :            'Unknown'\n");
+                        }
+                        printf("\t\t\t\tAddress :      '");
+                        for(i = 0x00; i < 6; i++)
                         {
-                            printf(" 'Unknown'\n");
-                        } break;
-                    }
-                    if(HANDOVER_TYPE_BT == HandoverSelectContent.bluetooth.type)
-                    {
-                        printf("\t\t\t\tType :         'BT'\n");
-                    }
-                    else if(HANDOVER_TYPE_BLE == HandoverSelectContent.bluetooth.type)
-                    {
-                        printf("\t\t\t\tType :         'BLE'\n");
+                            printf("%02X ", HandoverSelectContent.bluetooth.address[i]);
+                        }
+                        printf("'\n\t\t\t\tDevice Name :  '");
+                        for(i = 0x00; i < HandoverSelectContent.bluetooth.device_name_length; i++)
+                        {
+                            printf("%c ", HandoverSelectContent.bluetooth.device_name[i]);
+                        }
+                        printf("'\n\t\t\t\tNDEF Record :     \n\t\t\t\t");
+                        for(i = 0x01; i < HandoverSelectContent.bluetooth.ndef_length+1; i++)
+                        {
+                            printf("%02X ", HandoverSelectContent.bluetooth.ndef[i]);
+                            if(i%8 == 0)
+                            {
+                                printf("\n\t\t\t\t");
+                            }
+                        }
+                        printf("\n\t\tWIFI : \n\t\t\t\tPower state : ");
+                        switch(HandoverSelectContent.wifi.power_state)
+                        {
+                            case HANDOVER_CPS_INACTIVE:
+                                {
+                                    printf(" 'Inactive'\n");
+                                } break;
+                            case HANDOVER_CPS_ACTIVE:
+                                {
+                                    printf(" 'Active'\n");
+                                } break;
+                            case HANDOVER_CPS_ACTIVATING:
+                                {
+                                    printf(" 'Activating'\n");
+                                } break;
+                            case HANDOVER_CPS_UNKNOWN:
+                                {
+                                    printf(" 'Unknown'\n");
+                                } break;
+                            default:
+                                {
+                                    printf(" 'Unknown'\n");
+                                } break;
+                        }
+
+                        printf("\t\t\t\tSSID :         '");
+                        for(i = 0x01; i < HandoverSelectContent.wifi.ssid_length+1; i++)
+                        {
+                            printf("%02X ", HandoverSelectContent.wifi.ssid[i]);
+                            if(i%30 == 0)
+                            {
+                                printf("\n");
+                            }
+                        }
+                        printf("'\n\t\t\t\tKey :          '");
+                        for(i = 0x01; i < HandoverSelectContent.wifi.key_length+1; i++)
+                        {
+                            printf("%02X ", HandoverSelectContent.wifi.key[i]);
+                            if(i%30 == 0)
+                            {
+                                printf("\n");
+                            }
+                        }
+                        printf("'\n\t\t\t\tNDEF Record : \n");
+                        for(i = 0x01; i < HandoverSelectContent.wifi.ndef_length+1; i++)
+                        {
+                            printf("%02X ", HandoverSelectContent.wifi.ndef[i]);
+                            if(i%30 == 0)
+                            {
+                                printf("\n");
+                            }
+                        }
+                        printf("\n");
                     }
                     else
                     {
-                        printf("\t\t\t\tType :            'Unknown'\n");
-                    }
-                    printf("\t\t\t\tAddress :      '");
-                    for(i = 0x00; i < 6; i++)
-                    {
-                        printf("%02X ", HandoverSelectContent.bluetooth.address[i]);
-                    }
-                    printf("'\n\t\t\t\tDevice Name :  '");
-                    for(i = 0x00; i < HandoverSelectContent.bluetooth.device_name_length; i++)
-                    {
-                        printf("%c ", HandoverSelectContent.bluetooth.device_name[i]);
-                    }
-                    printf("'\n\t\t\t\tNDEF Record :     \n\t\t\t\t");
-                    for(i = 0x01; i < HandoverSelectContent.bluetooth.ndef_length+1; i++)
-                    {
-                        printf("%02X ", HandoverSelectContent.bluetooth.ndef[i]);
-                        if(i%8 == 0)
-                        {
-                            printf("\n\t\t\t\t");
-                        }
-                    }
-                    printf("\n\t\tWIFI : \n\t\t\t\tPower state : ");
-                    switch(HandoverSelectContent.wifi.power_state)
-                    {
-                        case HANDOVER_CPS_INACTIVE:
-                        {
-                            printf(" 'Inactive'\n");
-                        } break;
-                        case HANDOVER_CPS_ACTIVE:
-                        {
-                            printf(" 'Active'\n");
-                        } break;
-                        case HANDOVER_CPS_ACTIVATING:
-                        {
-                            printf(" 'Activating'\n");
-                        } break;
-                        case HANDOVER_CPS_UNKNOWN:
-                        {
-                            printf(" 'Unknown'\n");
-                        } break;
-                        default:
-                        {
-                            printf(" 'Unknown'\n");
-                        } break;
+                        printf("\n\t\tRead NDEF Handover Select Failed\n");
                     }
 
-                    printf("\t\t\t\tSSID :         '");
-                    for(i = 0x01; i < HandoverSelectContent.wifi.ssid_length+1; i++)
-                    {
-                        printf("%02X ", HandoverSelectContent.wifi.ssid[i]);
-                        if(i%30 == 0)
-                        {
-                            printf("\n");
-                        }
-                    }
-                    printf("'\n\t\t\t\tKey :          '");
-                    for(i = 0x01; i < HandoverSelectContent.wifi.key_length+1; i++)
-                    {
-                        printf("%02X ", HandoverSelectContent.wifi.key[i]);
-                        if(i%30 == 0)
-                        {
-                            printf("\n");
-                        }
-                    }
-                    printf("'\n\t\t\t\tNDEF Record : \n");
-                    for(i = 0x01; i < HandoverSelectContent.wifi.ndef_length+1; i++)
-                    {
-                        printf("%02X ", HandoverSelectContent.wifi.ndef[i]);
-                        if(i%30 == 0)
-                        {
-                            printf("\n");
-                        }
-                    }
-                    printf("\n");
-                }
-                else
-                {
-                    printf("\n\t\tRead NDEF Handover Select Failed\n");
-                }
-
-            } break;
+                } break;
             case NDEF_FRIENDLY_TYPE_HR:
-            {
-                res = ndef_readHandoverRequestInfo(NDEFContent, res, &HandoverRequestContent);
-                if(0x00 <= res)
                 {
-                    printf("\n\t\tHandover Request : \n");
-                    printf("\t\tBluetooth : \n\t\t\t\tPower state : ");
-                    switch(HandoverRequestContent.bluetooth.power_state)
+                    res = ndef_readHandoverRequestInfo(NDEFContent, res, &HandoverRequestContent);
+                    if(0x00 <= res)
                     {
-                        case HANDOVER_CPS_INACTIVE:
+                        printf("\n\t\tHandover Request : \n");
+                        printf("\t\tBluetooth : \n\t\t\t\tPower state : ");
+                        switch(HandoverRequestContent.bluetooth.power_state)
                         {
-                            printf(" 'Inactive'\n");
-                        } break;
-                        case HANDOVER_CPS_ACTIVE:
+                            case HANDOVER_CPS_INACTIVE:
+                                {
+                                    printf(" 'Inactive'\n");
+                                } break;
+                            case HANDOVER_CPS_ACTIVE:
+                                {
+                                    printf(" 'Active'\n");
+                                } break;
+                            case HANDOVER_CPS_ACTIVATING:
+                                {
+                                    printf(" 'Activating'\n");
+                                } break;
+                            case HANDOVER_CPS_UNKNOWN:
+                                {
+                                    printf(" 'Unknown'\n");
+                                } break;
+                            default:
+                                {
+                                    printf(" 'Unknown'\n");
+                                } break;
+                        }
+                        if(HANDOVER_TYPE_BT == HandoverRequestContent.bluetooth.type)
                         {
-                            printf(" 'Active'\n");
-                        } break;
-                        case HANDOVER_CPS_ACTIVATING:
+                            printf("\t\t\t\tType :         'BT'\n");
+                        }
+                        else if(HANDOVER_TYPE_BLE == HandoverRequestContent.bluetooth.type)
                         {
-                            printf(" 'Activating'\n");
-                        } break;
-                        case HANDOVER_CPS_UNKNOWN:
+                            printf("\t\t\t\tType :         'BLE'\n");
+                        }
+                        else
                         {
-                            printf(" 'Unknown'\n");
-                        } break;
-                        default:
+                            printf("\t\t\t\tType :            'Unknown'\n");
+                        }
+                        printf("\t\t\t\tAddress :      '");
+                        for(i = 0x00; i < 6; i++)
                         {
-                            printf(" 'Unknown'\n");
-                        } break;
-                    }
-                    if(HANDOVER_TYPE_BT == HandoverRequestContent.bluetooth.type)
-                    {
-                        printf("\t\t\t\tType :         'BT'\n");
-                    }
-                    else if(HANDOVER_TYPE_BLE == HandoverRequestContent.bluetooth.type)
-                    {
-                        printf("\t\t\t\tType :         'BLE'\n");
+                            printf("%02X ", HandoverRequestContent.bluetooth.address[i]);
+                        }
+                        printf("'\n\t\t\t\tDevice Name :  '");
+                        for(i = 0x00; i < HandoverRequestContent.bluetooth.device_name_length; i++)
+                        {
+                            printf("%c ", HandoverRequestContent.bluetooth.device_name[i]);
+                        }
+                        printf("'\n\t\t\t\tNDEF Record :     \n\t\t\t\t");
+                        for(i = 0x01; i < HandoverRequestContent.bluetooth.ndef_length+1; i++)
+                        {
+                            printf("%02X ", HandoverRequestContent.bluetooth.ndef[i]);
+                            if(i%8 == 0)
+                            {
+                                printf("\n\t\t\t\t");
+                            }
+                        }
+                        printf("\n\t\t\t\tWIFI :         'Has WIFI Request : %X '", HandoverRequestContent.wifi.has_wifi);
+                        printf("\n\t\t\t\tNDEF Record :     \n\t\t\t\t");
+                        for(i = 0x01; i < HandoverRequestContent.wifi.ndef_length+1; i++)
+                        {
+                            printf("%02X ", HandoverRequestContent.wifi.ndef[i]);
+                            if(i%8 == 0)
+                            {
+                                printf("\n\t\t\t\t");
+                            }
+                        }
+                        printf("\n");
                     }
                     else
                     {
-                        printf("\t\t\t\tType :            'Unknown'\n");
+                        printf("\n\t\tRead NDEF Handover Request Failed\n");
                     }
-                    printf("\t\t\t\tAddress :      '");
-                    for(i = 0x00; i < 6; i++)
-                    {
-                        printf("%02X ", HandoverRequestContent.bluetooth.address[i]);
-                    }
-                    printf("'\n\t\t\t\tDevice Name :  '");
-                    for(i = 0x00; i < HandoverRequestContent.bluetooth.device_name_length; i++)
-                    {
-                        printf("%c ", HandoverRequestContent.bluetooth.device_name[i]);
-                    }
-                    printf("'\n\t\t\t\tNDEF Record :     \n\t\t\t\t");
-                    for(i = 0x01; i < HandoverRequestContent.bluetooth.ndef_length+1; i++)
-                    {
-                        printf("%02X ", HandoverRequestContent.bluetooth.ndef[i]);
-                        if(i%8 == 0)
-                        {
-                            printf("\n\t\t\t\t");
-                        }
-                    }
-                    printf("\n\t\t\t\tWIFI :         'Has WIFI Request : %X '", HandoverRequestContent.wifi.has_wifi);
-                    printf("\n\t\t\t\tNDEF Record :     \n\t\t\t\t");
-                    for(i = 0x01; i < HandoverRequestContent.wifi.ndef_length+1; i++)
-                    {
-                        printf("%02X ", HandoverRequestContent.wifi.ndef[i]);
-                        if(i%8 == 0)
-                        {
-                            printf("\n\t\t\t\t");
-                        }
-                    }
-                    printf("\n");
-                }
-                else
-                {
-                    printf("\n\t\tRead NDEF Handover Request Failed\n");
-                }
-            } break;
+                } break;
             case NDEF_FRIENDLY_TYPE_OTHER:
-            {
-                switch(NDEFContent[0] & 0x7)
                 {
-                    case NDEF_TNF_EMPTY:
+                    switch(NDEFContent[0] & 0x7)
                     {
-                        printf("\n\t\tTNF Empty\n");
-                    } break;
-                    case NDEF_TNF_WELLKNOWN:
-                    {
-                        printf("\n\t\tTNF Well Known\n");
-                    } break;
-                    case NDEF_TNF_MEDIA:
-                    {
-                        printf("\n\t\tTNF Media\n");
-                        printf("\t\t\tType : ");
-                        for(i = 0x00; i < NDEFContent[1]; i++)
-                        {
-                            printf("%c", NDEFContent[3 + i]);
-                        }
-                        printf("\n\t\t\tData : ");
-                        for(i = 0x00; i < NDEFContent[2]; i++)
-                         {
-                            printf("%c", NDEFContent[3 + NDEFContent[1] + i]);
-                            if('\n' == NDEFContent[3 + NDEFContent[1] + i])
+                        case NDEF_TNF_EMPTY:
                             {
-                                printf("\t\t\t");
-                            }
-                        }
-                        printf("\n");
+                                printf("\n\t\tTNF Empty\n");
+                            } break;
+                        case NDEF_TNF_WELLKNOWN:
+                            {
+                                printf("\n\t\tTNF Well Known\n");
+                            } break;
+                        case NDEF_TNF_MEDIA:
+                            {
+                                printf("\n\t\tTNF Media\n");
+                                printf("\t\t\tType : ");
+                                for(i = 0x00; i < NDEFContent[1]; i++)
+                                {
+                                    printf("%c", NDEFContent[3 + i]);
+                                }
+                                printf("\n\t\t\tData : ");
+                                for(i = 0x00; i < NDEFContent[2]; i++)
+                                {
+                                    printf("%c", NDEFContent[3 + NDEFContent[1] + i]);
+                                    if('\n' == NDEFContent[3 + NDEFContent[1] + i])
+                                    {
+                                        printf("\t\t\t");
+                                    }
+                                }
+                                printf("\n");
 
-                    } break;
-                    case NDEF_TNF_URI:
-                    {
-                        printf("\n\t\tTNF URI\n");
-                    } break;
-                    case NDEF_TNF_EXT:
-                    {
-                        printf("\n\t\tTNF External\n");
-                        printf("\t\t\tType : ");
-                        for(i = 0x00; i < NDEFContent[1]; i++)
-                        {
-                            printf("%c", NDEFContent[3 + i]);
-                        }
-                        printf("\n\t\t\tData : ");
-                        for(i = 0x00; i < NDEFContent[2]; i++)
-                         {
-                            printf("%c", NDEFContent[3 + NDEFContent[1] + i]);
-                            if('\n' == NDEFContent[3 + NDEFContent[1] + i])
+                            } break;
+                        case NDEF_TNF_URI:
                             {
-                                printf("\t\t\t");
-                            }
-                        }
-                        printf("\n");
-                    } break;
-                    case NDEF_TNF_UNKNOWN:
-                    {
-                        printf("\n\t\tTNF Unknown\n");
-                    } break;
-                    case NDEF_TNF_UNCHANGED:
-                    {
-                        printf("\n\t\tTNF Unchanged\n");
-                    } break;
-                    default:
-                    {
-                        printf("\n\t\tTNF Other\n");
-                    } break;
-                }
-            } break;
+                                printf("\n\t\tTNF URI\n");
+                            } break;
+                        case NDEF_TNF_EXT:
+                            {
+                                printf("\n\t\tTNF External\n");
+                                printf("\t\t\tType : ");
+                                for(i = 0x00; i < NDEFContent[1]; i++)
+                                {
+                                    printf("%c", NDEFContent[3 + i]);
+                                }
+                                printf("\n\t\t\tData : ");
+                                for(i = 0x00; i < NDEFContent[2]; i++)
+                                {
+                                    printf("%c", NDEFContent[3 + NDEFContent[1] + i]);
+                                    if('\n' == NDEFContent[3 + NDEFContent[1] + i])
+                                    {
+                                        printf("\t\t\t");
+                                    }
+                                }
+                                printf("\n");
+                            } break;
+                        case NDEF_TNF_UNKNOWN:
+                            {
+                                printf("\n\t\tTNF Unknown\n");
+                            } break;
+                        case NDEF_TNF_UNCHANGED:
+                            {
+                                printf("\n\t\tTNF Unchanged\n");
+                            } break;
+                        default:
+                            {
+                                printf("\n\t\tTNF Other\n");
+                            } break;
+                    }
+                } break;
             default:
-            {
-            } break;
+                {
+                } break;
         }
         printf("\t\t%d bytes of NDEF data received :\n\t\t", ndefRawLen);
         for(i = 0x00; i < ndefRawLen; i++)
@@ -1303,7 +1303,7 @@ int build_ndef_message(int arg_len, char** arg, unsigned char** outNDEFBuffer, u
 }
 
 /* if data = NULL this tag is not followed by dataStr : for example -h --help
-if format = 0 tag format -t "text" if format=1 tag format : --type=text */
+   if format = 0 tag format -t "text" if format=1 tag format : --type=text */
 int look_for_tag(char** args, int args_len, char* tag, char** data, int format)
 {
     int res = 0xFF;
@@ -1494,7 +1494,7 @@ int init_env()
         {
             res = 0xFF;
         }
-     }
+    }
 
     if(0x00 == res)
     {
