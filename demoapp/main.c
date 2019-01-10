@@ -72,6 +72,10 @@ void onServerDeviceArrival (void)
     framework_LockMutex(g_devLock);
     printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     switch(g_DevState)
     {
         case eDevState_WAIT_DEPARTURE:
@@ -108,8 +112,14 @@ void onServerDeviceArrival (void)
         } break;
     }
 
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     framework_UnlockMutex(g_devLock);
     printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+
+    printf("\tSNEP server - onDeviceArrival return - Line %d\n", __LINE__);
 }
 
 void onServerDeviceDeparture (void)
@@ -120,6 +130,10 @@ void onServerDeviceDeparture (void)
     framework_LockMutex(g_devLock);
     printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     switch(g_DevState)
     {
         case eDevState_WAIT_DEPARTURE:
@@ -151,6 +165,11 @@ void onServerDeviceDeparture (void)
             g_Dev_Type = eDevType_NONE;
         } break;
     }
+
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     framework_UnlockMutex(g_devLock);
     printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 
@@ -186,6 +205,8 @@ void onServerDeviceDeparture (void)
 
     framework_UnlockMutex(g_SnepClientLock);
     printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+
+    printf("\tSNEP server - onDeviceDeparture return - Line %d\n", __LINE__);
 }
 
 void onServerMessageReceived(unsigned char *message, unsigned int length)
@@ -204,6 +225,10 @@ void onClientDeviceArrival()
     framework_LockMutex(g_devLock);
     printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     switch(g_DevState)
     {
         case eDevState_WAIT_DEPARTURE:
@@ -239,6 +264,11 @@ void onClientDeviceArrival()
             g_DevState = eDevState_PRESENT;
         } break;
     }
+
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     framework_UnlockMutex(g_devLock);
     printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 
@@ -274,6 +304,8 @@ void onClientDeviceArrival()
 
     framework_UnlockMutex(g_SnepClientLock);
     printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+
+    printf("\tSNEP client - onDeviceArrival return - Line %d\n", __LINE__);
 }
 
 void onClientDeviceDeparture()
@@ -284,6 +316,10 @@ void onClientDeviceDeparture()
     framework_LockMutex(g_devLock);
     printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     switch(g_DevState)
     {
         case eDevState_WAIT_DEPARTURE:
@@ -315,6 +351,10 @@ void onClientDeviceDeparture()
             g_Dev_Type = eDevType_NONE;
         } break;
     }
+    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+    // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
+
     framework_UnlockMutex(g_devLock);
     printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
 
@@ -350,6 +390,8 @@ void onClientDeviceDeparture()
 
     framework_UnlockMutex(g_SnepClientLock);
     printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+
+    printf("\tSNEP client - onDeviceDeparture return - Line %d\n", __LINE__);
 }
 
 int InitMode(int tag, int p2p, int hce)
@@ -458,6 +500,7 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
         framework_UnlockMutex(g_SnepClientLock);
         printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
 
+        printf("\tPutting SNEP message - Line %d\n", __LINE__);
         res = nfcSnep_putMessage(msgToPush, len);
 
         if(0x00 != res)
@@ -866,7 +909,9 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
         framework_LockMutex(g_devLock);
         printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
 
-        printf("\tg_DevState: %d\n", g_DevState);
+        printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+        // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
+        // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
         printf("\tLine %d\n", __LINE__);
         if(eDevState_EXIT == g_DevState)
@@ -941,6 +986,8 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                 break;
             }
 
+            printf("\tg_DevState: %d - Line %d\n", g_DevState, __LINE__); // 4 == eDevState_DEPARTED
+
             if(eDevState_PRESENT == g_DevState)
             {
                 printf("\teDevState_PRESENT == g_DevState\n");
@@ -950,7 +997,7 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                 printf("\tMutex pass - g_devLock - Line %d\n", __LINE__);
                 if(eDevType_P2P == DevTypeBck)
                 {
-                    printf("\tDevice Lost\n");
+                    printf("\tDevice Lost - not really\n");
                 }
                 DevTypeBck = eDevType_NONE;
             }
@@ -959,6 +1006,8 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                 printf("\teDevType_P2P == DevTypeBck\n");
                 printf("\tDevice Lost\n");
             }
+
+            printf("\tg_DevState: %d - Line %d\n", g_DevState, __LINE__); // 4 == eDevState_DEPARTED
         }
 
         framework_UnlockMutex(g_devLock);
