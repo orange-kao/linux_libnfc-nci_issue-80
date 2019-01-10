@@ -50,9 +50,11 @@ typedef enum eDevType
 static void* g_ThreadHandle = NULL;
 static void* g_devLock = NULL;
 static void* g_SnepClientLock = NULL;
-static eDevState g_DevState = eDevState_NONE;
-static eDevType g_Dev_Type = eDevType_NONE;
-static eSnepClientState g_SnepClientState = eSnepClientState_OFF;
+
+static eDevState g_DevState = eDevState_NONE; // protected by g_devLock
+static eDevType g_Dev_Type = eDevType_NONE; // protected by g_devLock
+static eSnepClientState g_SnepClientState = eSnepClientState_OFF; // protected by g_SnepClientLock
+
 static nfcSnepServerCallback_t g_SnepServerCB;
 static nfcSnepClientCallback_t g_SnepClientCB;
 
@@ -74,6 +76,7 @@ void onServerDeviceArrival (void)
             g_DevState = eDevState_PRESENT;
             g_Dev_Type = eDevType_P2P;
             framework_NotifyMutex(g_devLock, 0);
+            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
         } break;
         case eDevState_EXIT:
         {
@@ -89,6 +92,7 @@ void onServerDeviceArrival (void)
             g_DevState = eDevState_PRESENT;
             g_Dev_Type = eDevType_P2P;
             framework_NotifyMutex(g_devLock, 0);
+            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
         } break;
         case eDevState_PRESENT:
         {
@@ -116,6 +120,7 @@ void onServerDeviceDeparture (void)
             g_DevState = eDevState_DEPARTED;
             g_Dev_Type = eDevType_NONE;
             framework_NotifyMutex(g_devLock, 0);
+            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
         } break;
         case eDevState_EXIT:
         {
@@ -149,6 +154,7 @@ void onServerDeviceDeparture (void)
         {
             g_SnepClientState = eSnepClientState_OFF;
             framework_NotifyMutex(g_SnepClientLock, 0);
+            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
         } break;
         case eSnepClientState_OFF:
         {
@@ -157,6 +163,7 @@ void onServerDeviceDeparture (void)
         {
             g_SnepClientState = eSnepClientState_OFF;
             framework_NotifyMutex(g_SnepClientLock, 0);
+            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
         } break;
         case eSnepClientState_READY:
         {
@@ -190,6 +197,7 @@ void onClientDeviceArrival()
             g_DevState = eDevState_PRESENT;
             g_Dev_Type = eDevType_P2P;
             framework_NotifyMutex(g_devLock, 0);
+            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
         } break;
         case eDevState_EXIT:
         {
@@ -205,6 +213,7 @@ void onClientDeviceArrival()
             g_DevState = eDevState_PRESENT;
             g_Dev_Type = eDevType_P2P;
             framework_NotifyMutex(g_devLock, 0);
+            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
         } break;
         case eDevState_PRESENT:
         {
@@ -226,6 +235,7 @@ void onClientDeviceArrival()
         {
             g_SnepClientState = eSnepClientState_READY;
             framework_NotifyMutex(g_SnepClientLock, 0);
+            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
         } break;
         case eSnepClientState_OFF:
         {
@@ -235,6 +245,7 @@ void onClientDeviceArrival()
         {
             g_SnepClientState = eSnepClientState_READY;
             framework_NotifyMutex(g_SnepClientLock, 0);
+            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
         } break;
         case eSnepClientState_READY:
         {
@@ -259,6 +270,7 @@ void onClientDeviceDeparture()
             g_DevState = eDevState_DEPARTED;
             g_Dev_Type = eDevType_NONE;
             framework_NotifyMutex(g_devLock, 0);
+            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
         } break;
         case eDevState_EXIT:
         {
@@ -292,6 +304,7 @@ void onClientDeviceDeparture()
         {
             g_SnepClientState = eSnepClientState_OFF;
             framework_NotifyMutex(g_SnepClientLock, 0);
+            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
         } break;
         case eSnepClientState_OFF:
         {
@@ -300,6 +313,7 @@ void onClientDeviceDeparture()
         {
             g_SnepClientState = eSnepClientState_OFF;
             framework_NotifyMutex(g_SnepClientLock, 0);
+            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
         } break;
         case eSnepClientState_READY:
         {
@@ -396,7 +410,9 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     {
         framework_UnlockMutex(g_devLock);
         g_SnepClientState = eSnepClientState_WAIT_READY;
+        printf("\tMutex wait - g_SnepClientLock - Line %d\n", __LINE__);
         framework_WaitMutex(g_SnepClientLock, 0);
+        printf("\tMutex pass - g_SnepClientLock - Line %d\n", __LINE__);
     }
     else
     {
@@ -826,9 +842,9 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
         {
             printf("Waiting for a Tag/Device...\n");
             g_DevState = eDevState_WAIT_ARRIVAL;
-            printf("\tLine %d\n", __LINE__);
+            printf("\tMutex wait - g_devLock - Line %d\n", __LINE__);
             framework_WaitMutex(g_devLock, 0);
-            printf("\tLine %d\n", __LINE__);
+            printf("\tMutex pass - g_devLock - Line %d\n", __LINE__);
         }
 
         printf("\tLine %d\n", __LINE__);
@@ -860,9 +876,9 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                 {
                     printf("\teSnepClientState_READY == g_SnepClientState\n");
                     g_SnepClientState = eSnepClientState_WAIT_OFF;
-                    printf("\tLine %d\n", __LINE__);
+                    printf("\tMutex wait - g_SnepClientLock - Line %d\n", __LINE__);
                     framework_WaitMutex(g_SnepClientLock, 0);
-                    printf("\tLine %d\n", __LINE__);
+                    printf("\tMutex pass - g_SnepClientLock - Line %d\n", __LINE__);
                 }
 
                 printf("\tLine %d\n", __LINE__);
@@ -882,7 +898,9 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
             {
                 printf("\teDevState_PRESENT == g_DevState\n");
                 g_DevState = eDevState_WAIT_DEPARTURE;
+                printf("\tMutex wait - g_devLock - Line %d\n", __LINE__);
                 framework_WaitMutex(g_devLock, 0);
+                printf("\tMutex pass - g_devLock - Line %d\n", __LINE__);
                 if(eDevType_P2P == DevTypeBck)
                 {
                     printf("\tDevice Lost\n");
@@ -1330,6 +1348,7 @@ void* ExitThread(void* pContext)
     {
         g_SnepClientState = eSnepClientState_EXIT;
         framework_NotifyMutex(g_SnepClientLock, 0);
+        printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
     }
     else
     {
@@ -1343,6 +1362,7 @@ void* ExitThread(void* pContext)
     {
         g_DevState = eDevState_EXIT;
         framework_NotifyMutex(g_devLock, 0);
+        printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
     }
     else
     {
