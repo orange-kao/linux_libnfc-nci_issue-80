@@ -22,38 +22,38 @@
 #include "linux_nfc_api.h"
 #include "tools.h"
 
-typedef enum eDevState
+typedef enum DevState
 {
-    eDevState_NONE,
-    eDevState_WAIT_ARRIVAL,
-    eDevState_PRESENT,
-    eDevState_WAIT_DEPARTURE,
-    eDevState_DEPARTED,
-    eDevState_EXIT
-}eDevState;
-typedef enum eSnepClientState
+    DEV_STATE_NONE,
+    DEV_STATE_WAIT_ARRIVAL,
+    DEV_STATE_PRESENT,
+    DEV_STATE_WAIT_DEPARTURE,
+    DEV_STATE_DEPARTED,
+    DEV_STATE_EXIT
+}DevState;
+typedef enum SnepClientState
 {
-    eSnepClientState_WAIT_OFF,
-    eSnepClientState_OFF,
-    eSnepClientState_WAIT_READY,
-    eSnepClientState_READY,
-    eSnepClientState_EXIT
-}eSnepClientState;
-typedef enum eDevType
+    SNEP_CLIENT_STATE_WAIT_OFF,
+    SNEP_CLIENT_STATE_OFF,
+    SNEP_CLIENT_STATE_WAIT_READY,
+    SNEP_CLIENT_STATE_READY,
+    SNEP_CLIENT_STATE_EXIT
+}SnepClientState;
+typedef enum DevType
 {
-    eDevType_NONE,
-    eDevType_TAG,
-    eDevType_P2P,
-    eDevType_READER
-}eDevType;
+    DEV_TYPE_NONE,
+    DEV_TYPE_TAG,
+    DEV_TYPE_P2P,
+    DEV_TYPE_READER
+}DevType;
 
-static void* g_ThreadHandle = NULL;
-static void* g_devLock = NULL;
-static void* g_SnepClientLock = NULL;
+static void* global_thread_handle = NULL;
+static void* global_dev_lock = NULL;
+static void* global_snep_client_lock = NULL;
 
-static eDevState g_DevState = eDevState_NONE; // protected by g_devLock
-static eDevType g_Dev_Type = eDevType_NONE; // protected by g_devLock
-static eSnepClientState g_SnepClientState = eSnepClientState_OFF; // protected by g_SnepClientLock
+static DevState global_dev_state = DEV_STATE_NONE; // protected by global_dev_lock
+static DevType global_dev_type = DEV_TYPE_NONE; // protected by global_dev_lock
+static SnepClientState global_snep_client_state = SNEP_CLIENT_STATE_OFF; // protected by global_snep_client_lock
 
 static nfcSnepServerCallback_t g_SnepServerCB;
 static nfcSnepClientCallback_t g_SnepClientCB;
@@ -68,56 +68,56 @@ void onServerDeviceArrival (void)
 {
     printf("\tSNEP server - onDeviceArrival - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_devLock);
-    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_dev_lock);
+    printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    switch(g_DevState)
+    switch(global_dev_state)
     {
-        case eDevState_WAIT_DEPARTURE:
+        case DEV_STATE_WAIT_DEPARTURE:
         {
-            g_DevState = eDevState_PRESENT;
-            g_Dev_Type = eDevType_P2P;
-            framework_NotifyMutex(g_devLock, 0);
-            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
+            framework_NotifyMutex(global_dev_lock, 0);
+            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
         } break;
-        case eDevState_EXIT:
+        case DEV_STATE_EXIT:
         {
-            g_Dev_Type = eDevType_P2P;
+            global_dev_type = DEV_TYPE_P2P;
         } break;
-        case eDevState_NONE:
+        case DEV_STATE_NONE:
         {
-            g_DevState = eDevState_PRESENT;
-            g_Dev_Type = eDevType_P2P;
+            global_dev_state = DEV_STATE_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
         } break;
-        case eDevState_WAIT_ARRIVAL:
+        case DEV_STATE_WAIT_ARRIVAL:
         {
-            g_DevState = eDevState_PRESENT;
-            g_Dev_Type = eDevType_P2P;
-            framework_NotifyMutex(g_devLock, 0);
-            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
+            framework_NotifyMutex(global_dev_lock, 0);
+            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
         } break;
-        case eDevState_PRESENT:
+        case DEV_STATE_PRESENT:
         {
-            g_Dev_Type = eDevType_P2P;
+            global_dev_type = DEV_TYPE_P2P;
         } break;
-        case eDevState_DEPARTED:
+        case DEV_STATE_DEPARTED:
         {
-            g_Dev_Type = eDevType_P2P;
-            g_DevState = eDevState_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
+            global_dev_state = DEV_STATE_PRESENT;
         } break;
     }
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    framework_UnlockMutex(g_devLock);
-    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_dev_lock);
+    printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
     printf("\tSNEP server - onDeviceArrival return - Line %d\n", __LINE__);
 }
@@ -126,85 +126,85 @@ void onServerDeviceDeparture (void)
 {
     printf("\tSNEP server - onDeviceDeparture - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_devLock);
-    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_dev_lock);
+    printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    switch(g_DevState)
+    switch(global_dev_state)
     {
-        case eDevState_WAIT_DEPARTURE:
+        case DEV_STATE_WAIT_DEPARTURE:
         {
-            g_DevState = eDevState_DEPARTED;
-            g_Dev_Type = eDevType_NONE;
-            framework_NotifyMutex(g_devLock, 0);
-            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_DEPARTED;
+            global_dev_type = DEV_TYPE_NONE;
+            framework_NotifyMutex(global_dev_lock, 0);
+            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
         } break;
-        case eDevState_EXIT:
+        case DEV_STATE_EXIT:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
-        case eDevState_NONE:
+        case DEV_STATE_NONE:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
-        case eDevState_WAIT_ARRIVAL:
+        case DEV_STATE_WAIT_ARRIVAL:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
-        case eDevState_PRESENT:
+        case DEV_STATE_PRESENT:
         {
-            g_Dev_Type = eDevType_NONE;
-            g_DevState = eDevState_DEPARTED;
+            global_dev_type = DEV_TYPE_NONE;
+            global_dev_state = DEV_STATE_DEPARTED;
         } break;
-        case eDevState_DEPARTED:
+        case DEV_STATE_DEPARTED:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
     }
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    framework_UnlockMutex(g_devLock);
-    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_dev_lock);
+    printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_SnepClientLock);
-    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_snep_client_lock);
+    printf("\tMutex locked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    switch(g_SnepClientState)
+    switch(global_snep_client_state)
     {
-        case eSnepClientState_WAIT_OFF:
+        case SNEP_CLIENT_STATE_WAIT_OFF:
         {
-            g_SnepClientState = eSnepClientState_OFF;
-            framework_NotifyMutex(g_SnepClientLock, 0);
-            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+            framework_NotifyMutex(global_snep_client_lock, 0);
+            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
         } break;
-        case eSnepClientState_OFF:
+        case SNEP_CLIENT_STATE_OFF:
         {
         } break;
-        case eSnepClientState_WAIT_READY:
+        case SNEP_CLIENT_STATE_WAIT_READY:
         {
-            g_SnepClientState = eSnepClientState_OFF;
-            framework_NotifyMutex(g_SnepClientLock, 0);
-            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+            framework_NotifyMutex(global_snep_client_lock, 0);
+            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
         } break;
-        case eSnepClientState_READY:
+        case SNEP_CLIENT_STATE_READY:
         {
-            g_SnepClientState = eSnepClientState_OFF;
+            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
         } break;
-        case eSnepClientState_EXIT:
+        case SNEP_CLIENT_STATE_EXIT:
         {
         } break;
     }
 
-    framework_UnlockMutex(g_SnepClientLock);
-    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_snep_client_lock);
+    printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
     printf("\tSNEP server - onDeviceDeparture return - Line %d\n", __LINE__);
 }
@@ -221,89 +221,89 @@ void onClientDeviceArrival()
 {
     printf("\tSNEP client - onDeviceArrival - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_devLock);
-    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_dev_lock);
+    printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    switch(g_DevState)
+    switch(global_dev_state)
     {
-        case eDevState_WAIT_DEPARTURE:
+        case DEV_STATE_WAIT_DEPARTURE:
         {
-            g_DevState = eDevState_PRESENT;
-            g_Dev_Type = eDevType_P2P;
-            framework_NotifyMutex(g_devLock, 0);
-            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
+            framework_NotifyMutex(global_dev_lock, 0);
+            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
         } break;
-        case eDevState_EXIT:
+        case DEV_STATE_EXIT:
         {
-            g_Dev_Type = eDevType_P2P;
+            global_dev_type = DEV_TYPE_P2P;
         } break;
-        case eDevState_NONE:
+        case DEV_STATE_NONE:
         {
-            g_DevState = eDevState_PRESENT;
-            g_Dev_Type = eDevType_P2P;
+            global_dev_state = DEV_STATE_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
         } break;
-        case eDevState_WAIT_ARRIVAL:
+        case DEV_STATE_WAIT_ARRIVAL:
         {
-            g_DevState = eDevState_PRESENT;
-            g_Dev_Type = eDevType_P2P;
-            framework_NotifyMutex(g_devLock, 0);
-            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
+            framework_NotifyMutex(global_dev_lock, 0);
+            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
         } break;
-        case eDevState_PRESENT:
+        case DEV_STATE_PRESENT:
         {
-            g_Dev_Type = eDevType_P2P;
+            global_dev_type = DEV_TYPE_P2P;
         } break;
-        case eDevState_DEPARTED:
+        case DEV_STATE_DEPARTED:
         {
-            g_Dev_Type = eDevType_P2P;
-            g_DevState = eDevState_PRESENT;
+            global_dev_type = DEV_TYPE_P2P;
+            global_dev_state = DEV_STATE_PRESENT;
         } break;
     }
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    framework_UnlockMutex(g_devLock);
-    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_dev_lock);
+    printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_SnepClientLock);
-    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_snep_client_lock);
+    printf("\tMutex locked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    switch(g_SnepClientState)
+    switch(global_snep_client_state)
     {
-        case eSnepClientState_WAIT_OFF:
+        case SNEP_CLIENT_STATE_WAIT_OFF:
         {
-            g_SnepClientState = eSnepClientState_READY;
-            framework_NotifyMutex(g_SnepClientLock, 0);
-            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+            global_snep_client_state = SNEP_CLIENT_STATE_READY;
+            framework_NotifyMutex(global_snep_client_lock, 0);
+            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
         } break;
-        case eSnepClientState_OFF:
+        case SNEP_CLIENT_STATE_OFF:
         {
-            g_SnepClientState = eSnepClientState_READY;
+            global_snep_client_state = SNEP_CLIENT_STATE_READY;
         } break;
-        case eSnepClientState_WAIT_READY:
+        case SNEP_CLIENT_STATE_WAIT_READY:
         {
-            g_SnepClientState = eSnepClientState_READY;
-            framework_NotifyMutex(g_SnepClientLock, 0);
-            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+            global_snep_client_state = SNEP_CLIENT_STATE_READY;
+            framework_NotifyMutex(global_snep_client_lock, 0);
+            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
         } break;
-        case eSnepClientState_READY:
+        case SNEP_CLIENT_STATE_READY:
         {
         } break;
-        case eSnepClientState_EXIT:
+        case SNEP_CLIENT_STATE_EXIT:
         {
         } break;
     }
 
-    framework_UnlockMutex(g_SnepClientLock);
-    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_snep_client_lock);
+    printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
     printf("\tSNEP client - onDeviceArrival return - Line %d\n", __LINE__);
 }
@@ -312,84 +312,84 @@ void onClientDeviceDeparture()
 {
     printf("\tSNEP client - onDeviceDeparture - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_devLock);
-    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_dev_lock);
+    printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    switch(g_DevState)
+    switch(global_dev_state)
     {
-        case eDevState_WAIT_DEPARTURE:
+        case DEV_STATE_WAIT_DEPARTURE:
         {
-            g_DevState = eDevState_DEPARTED;
-            g_Dev_Type = eDevType_NONE;
-            framework_NotifyMutex(g_devLock, 0);
-            printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_DEPARTED;
+            global_dev_type = DEV_TYPE_NONE;
+            framework_NotifyMutex(global_dev_lock, 0);
+            printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
         } break;
-        case eDevState_EXIT:
+        case DEV_STATE_EXIT:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
-        case eDevState_NONE:
+        case DEV_STATE_NONE:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
-        case eDevState_WAIT_ARRIVAL:
+        case DEV_STATE_WAIT_ARRIVAL:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
-        case eDevState_PRESENT:
+        case DEV_STATE_PRESENT:
         {
-            g_Dev_Type = eDevType_NONE;
-            g_DevState = eDevState_DEPARTED;
+            global_dev_type = DEV_TYPE_NONE;
+            global_dev_state = DEV_STATE_DEPARTED;
         } break;
-        case eDevState_DEPARTED:
+        case DEV_STATE_DEPARTED:
         {
-            g_Dev_Type = eDevType_NONE;
+            global_dev_type = DEV_TYPE_NONE;
         } break;
     }
-    printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+    printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
     // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
     // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
-    framework_UnlockMutex(g_devLock);
-    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_dev_lock);
+    printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_SnepClientLock);
-    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_snep_client_lock);
+    printf("\tMutex locked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    switch(g_SnepClientState)
+    switch(global_snep_client_state)
     {
-        case eSnepClientState_WAIT_OFF:
+        case SNEP_CLIENT_STATE_WAIT_OFF:
         {
-            g_SnepClientState = eSnepClientState_OFF;
-            framework_NotifyMutex(g_SnepClientLock, 0);
-            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+            framework_NotifyMutex(global_snep_client_lock, 0);
+            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
         } break;
-        case eSnepClientState_OFF:
+        case SNEP_CLIENT_STATE_OFF:
         {
         } break;
-        case eSnepClientState_WAIT_READY:
+        case SNEP_CLIENT_STATE_WAIT_READY:
         {
-            g_SnepClientState = eSnepClientState_OFF;
-            framework_NotifyMutex(g_SnepClientLock, 0);
-            printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
+            framework_NotifyMutex(global_snep_client_lock, 0);
+            printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
         } break;
-        case eSnepClientState_READY:
+        case SNEP_CLIENT_STATE_READY:
         {
-            g_SnepClientState = eSnepClientState_OFF;
+            global_snep_client_state = SNEP_CLIENT_STATE_OFF;
         } break;
-        case eSnepClientState_EXIT:
+        case SNEP_CLIENT_STATE_EXIT:
         {
         } break;
     }
 
-    framework_UnlockMutex(g_SnepClientLock);
-    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_snep_client_lock);
+    printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
     printf("\tSNEP client - onDeviceDeparture return - Line %d\n", __LINE__);
 }
@@ -470,35 +470,35 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     printf("\tSnepPush - Line %d\n", __LINE__);
     int res = 0x00;
 
-    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_devLock);
-    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_dev_lock);
+    printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_SnepClientLock);
-    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_snep_client_lock);
+    printf("\tMutex locked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    if(eSnepClientState_READY != g_SnepClientState && eSnepClientState_EXIT != g_SnepClientState && eDevState_PRESENT == g_DevState)
+    if(SNEP_CLIENT_STATE_READY != global_snep_client_state && SNEP_CLIENT_STATE_EXIT != global_snep_client_state && DEV_STATE_PRESENT == global_dev_state)
     {
-        framework_UnlockMutex(g_devLock);
-        printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+        framework_UnlockMutex(global_dev_lock);
+        printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
-        g_SnepClientState = eSnepClientState_WAIT_READY;
+        global_snep_client_state = SNEP_CLIENT_STATE_WAIT_READY;
 
-        printf("\tMutex wait - g_SnepClientLock - Line %d\n", __LINE__);
-        framework_WaitMutex(g_SnepClientLock, 0);
-        printf("\tMutex pass - g_SnepClientLock - Line %d\n", __LINE__);
+        printf("\tMutex wait - global_snep_client_lock - Line %d\n", __LINE__);
+        framework_WaitMutex(global_snep_client_lock, 0);
+        printf("\tMutex pass - global_snep_client_lock - Line %d\n", __LINE__);
     }
     else
     {
-        framework_UnlockMutex(g_devLock);
-        printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+        framework_UnlockMutex(global_dev_lock);
+        printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
     }
 
-    if(eSnepClientState_READY == g_SnepClientState)
+    if(SNEP_CLIENT_STATE_READY == global_snep_client_state)
     {
-        framework_UnlockMutex(g_SnepClientLock);
-        printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+        framework_UnlockMutex(global_snep_client_lock);
+        printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
         printf("\tPutting SNEP message - Line %d\n", __LINE__);
         res = nfcSnep_putMessage(msgToPush, len);
@@ -514,8 +514,8 @@ int SnepPush(unsigned char* msgToPush, unsigned int len)
     }
     else
     {
-        framework_UnlockMutex(g_SnepClientLock);
-        printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+        framework_UnlockMutex(global_snep_client_lock);
+        printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
     }
 
     return res;
@@ -899,56 +899,56 @@ void PrintNDEFContent(nfc_tag_info_t* TagInfo, ndef_info_t* NDEFinfo, unsigned c
 /* mode=1 => poll, mode=2 => push, mode=3 => write, mode=4 => HCE */
 int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
 {
-    eDevType DevTypeBck = eDevType_NONE;
+    DevType DevTypeBck = DEV_TYPE_NONE;
 
     do
     {
         printf("do loop first line\n");
 
-        printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-        framework_LockMutex(g_devLock);
-        printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+        printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+        framework_LockMutex(global_dev_lock);
+        printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-        printf("\tg_Dev_Type: %d. g_DevState: %d - Line %d\n", g_Dev_Type, g_DevState, __LINE__);
+        printf("\tglobal_dev_type: %d. global_dev_state: %d - Line %d\n", global_dev_type, global_dev_state, __LINE__);
         // type: 0 NONE, 1 TAG, 2 P2P, 3 READER
         // state: 0 NONE, 1 WAIT_ARRIVAL, 2 PRESENT, 3 WAIT_DEPARTURE, 4 DEPARTED, 5 EXIT
 
         printf("\tLine %d\n", __LINE__);
-        if(eDevState_EXIT == g_DevState)
+        if(DEV_STATE_EXIT == global_dev_state)
         {
-            printf("\teDevState_EXIT == g_DevState\n");
-            framework_UnlockMutex(g_devLock);
-            printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+            printf("\tDEV_STATE_EXIT == global_dev_state\n");
+            framework_UnlockMutex(global_dev_lock);
+            printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
             break;
         }
-        else if(eDevState_PRESENT != g_DevState)
+        else if(DEV_STATE_PRESENT != global_dev_state)
         {
             printf("Waiting for a Tag/Device...\n");
-            g_DevState = eDevState_WAIT_ARRIVAL;
-            printf("\tMutex wait - g_devLock - Line %d\n", __LINE__);
-            framework_WaitMutex(g_devLock, 0);
-            printf("\tMutex pass - g_devLock - Line %d\n", __LINE__);
+            global_dev_state = DEV_STATE_WAIT_ARRIVAL;
+            printf("\tMutex wait - global_dev_lock - Line %d\n", __LINE__);
+            framework_WaitMutex(global_dev_lock, 0);
+            printf("\tMutex pass - global_dev_lock - Line %d\n", __LINE__);
         }
 
         printf("\tLine %d\n", __LINE__);
-        if(eDevState_EXIT == g_DevState)
+        if(DEV_STATE_EXIT == global_dev_state)
         {
-            printf("\teDevState_EXIT == g_DevState\n");
-            framework_UnlockMutex(g_devLock);
-            printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+            printf("\tDEV_STATE_EXIT == global_dev_state\n");
+            framework_UnlockMutex(global_dev_lock);
+            printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
             break;
         }
 
         printf("\tLine %d\n", __LINE__);
-        if(eDevState_PRESENT == g_DevState)
+        if(DEV_STATE_PRESENT == global_dev_state)
         {
-            DevTypeBck = g_Dev_Type;
-            if(eDevType_P2P == g_Dev_Type)/*P2P Detected*/
+            DevTypeBck = global_dev_type;
+            if(DEV_TYPE_P2P == global_dev_type)/*P2P Detected*/
             {
-                printf("\teDevType_P2P == g_Dev_Type\n");
+                printf("\tDEV_TYPE_P2P == global_dev_type\n");
 
-                framework_UnlockMutex(g_devLock);
-                printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+                framework_UnlockMutex(global_dev_lock);
+                printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
 
                 printf("\tDevice Found\n");
 
@@ -957,61 +957,61 @@ int WaitDeviceArrival(int mode, unsigned char* msgToSend, unsigned int len)
                     SnepPush(msgToSend, len);
                 }
 
-                printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
-                framework_LockMutex(g_SnepClientLock);
-                printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
+                printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
+                framework_LockMutex(global_snep_client_lock);
+                printf("\tMutex locked - global_snep_client_lock - Line %d\n", __LINE__);
 
-                if(eSnepClientState_READY == g_SnepClientState)
+                if(SNEP_CLIENT_STATE_READY == global_snep_client_state)
                 {
-                    printf("\teSnepClientState_READY == g_SnepClientState\n");
-                    g_SnepClientState = eSnepClientState_WAIT_OFF;
-                    printf("\tMutex wait - g_SnepClientLock - Line %d\n", __LINE__);
-                    framework_WaitMutex(g_SnepClientLock, 0);
-                    printf("\tMutex pass - g_SnepClientLock - Line %d\n", __LINE__);
+                    printf("\tSNEP_CLIENT_STATE_READY == global_snep_client_state\n");
+                    global_snep_client_state = SNEP_CLIENT_STATE_WAIT_OFF;
+                    printf("\tMutex wait - global_snep_client_lock - Line %d\n", __LINE__);
+                    framework_WaitMutex(global_snep_client_lock, 0);
+                    printf("\tMutex pass - global_snep_client_lock - Line %d\n", __LINE__);
                 }
 
                 printf("\tLine %d\n", __LINE__);
-                framework_UnlockMutex(g_SnepClientLock);
-                printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+                framework_UnlockMutex(global_snep_client_lock);
+                printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
-                printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-                framework_LockMutex(g_devLock);
-                printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+                printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+                framework_LockMutex(global_dev_lock);
+                printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
             }
             else
             {
-                framework_UnlockMutex(g_devLock);
-                printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+                framework_UnlockMutex(global_dev_lock);
+                printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
                 break;
             }
 
-            printf("\tg_DevState: %d - Line %d\n", g_DevState, __LINE__); // 4 == eDevState_DEPARTED
+            printf("\tglobal_dev_state: %d - Line %d\n", global_dev_state, __LINE__); // 4 == DEV_STATE_DEPARTED
 
-            if(eDevState_PRESENT == g_DevState)
+            if(DEV_STATE_PRESENT == global_dev_state)
             {
-                printf("\teDevState_PRESENT == g_DevState\n");
-                g_DevState = eDevState_WAIT_DEPARTURE;
-                printf("\tMutex wait - g_devLock - Line %d\n", __LINE__);
-                framework_WaitMutex(g_devLock, 0);
-                printf("\tMutex pass - g_devLock - Line %d\n", __LINE__);
-                if(eDevType_P2P == DevTypeBck)
+                printf("\tDEV_STATE_PRESENT == global_dev_state\n");
+                global_dev_state = DEV_STATE_WAIT_DEPARTURE;
+                printf("\tMutex wait - global_dev_lock - Line %d\n", __LINE__);
+                framework_WaitMutex(global_dev_lock, 0);
+                printf("\tMutex pass - global_dev_lock - Line %d\n", __LINE__);
+                if(DEV_TYPE_P2P == DevTypeBck)
                 {
                     printf("\tDevice Lost - not really\n");
                 }
-                DevTypeBck = eDevType_NONE;
+                DevTypeBck = DEV_TYPE_NONE;
             }
-            else if(eDevType_P2P == DevTypeBck)
+            else if(DEV_TYPE_P2P == DevTypeBck)
             {
-                printf("\teDevType_P2P == DevTypeBck\n");
+                printf("\tDEV_TYPE_P2P == DevTypeBck\n");
                 printf("\tDevice Lost\n");
             }
 
-            printf("\tg_DevState: %d - Line %d\n", g_DevState, __LINE__); // 4 == eDevState_DEPARTED
+            printf("\tglobal_dev_state: %d - Line %d\n", global_dev_state, __LINE__); // 4 == DEV_STATE_DEPARTED
         }
 
-        framework_UnlockMutex(g_devLock);
-        printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+        framework_UnlockMutex(global_dev_lock);
+        printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
     }while(0x01);
     printf("\tdo loop break\n");
 
@@ -1439,40 +1439,40 @@ void* ExitThread(void* pContext)
 
     getchar();
 
-    printf("\tMutex lock   - g_SnepClientLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_SnepClientLock);
-    printf("\tMutex locked - g_SnepClientLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_snep_client_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_snep_client_lock);
+    printf("\tMutex locked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    if(eSnepClientState_WAIT_OFF == g_SnepClientState || eSnepClientState_WAIT_READY == g_SnepClientState)
+    if(SNEP_CLIENT_STATE_WAIT_OFF == global_snep_client_state || SNEP_CLIENT_STATE_WAIT_READY == global_snep_client_state)
     {
-        g_SnepClientState = eSnepClientState_EXIT;
-        framework_NotifyMutex(g_SnepClientLock, 0);
-        printf("\tMutex notify - g_SnepClientLock - Line %d\n", __LINE__);
+        global_snep_client_state = SNEP_CLIENT_STATE_EXIT;
+        framework_NotifyMutex(global_snep_client_lock, 0);
+        printf("\tMutex notify - global_snep_client_lock - Line %d\n", __LINE__);
     }
     else
     {
-        g_SnepClientState = eSnepClientState_EXIT;
+        global_snep_client_state = SNEP_CLIENT_STATE_EXIT;
     }
-    framework_UnlockMutex(g_SnepClientLock);
-    printf("\tMutex Unlocked - g_SnepClientLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_snep_client_lock);
+    printf("\tMutex Unlocked - global_snep_client_lock - Line %d\n", __LINE__);
 
-    printf("\tMutex lock   - g_devLock - Line %d\n", __LINE__);
-    framework_LockMutex(g_devLock);
-    printf("\tMutex locked - g_devLock - Line %d\n", __LINE__);
+    printf("\tMutex lock   - global_dev_lock - Line %d\n", __LINE__);
+    framework_LockMutex(global_dev_lock);
+    printf("\tMutex locked - global_dev_lock - Line %d\n", __LINE__);
 
-    if(eDevState_WAIT_ARRIVAL == g_DevState || eDevState_WAIT_DEPARTURE == g_DevState)
+    if(DEV_STATE_WAIT_ARRIVAL == global_dev_state || DEV_STATE_WAIT_DEPARTURE == global_dev_state)
     {
-        g_DevState = eDevState_EXIT;
-        framework_NotifyMutex(g_devLock, 0);
-        printf("\tMutex notify - g_devLock - Line %d\n", __LINE__);
+        global_dev_state = DEV_STATE_EXIT;
+        framework_NotifyMutex(global_dev_lock, 0);
+        printf("\tMutex notify - global_dev_lock - Line %d\n", __LINE__);
     }
     else
     {
-        g_DevState = eDevState_EXIT;
+        global_dev_state = DEV_STATE_EXIT;
     }
 
-    framework_UnlockMutex(g_devLock);
-    printf("\tMutex Unlocked - g_devLock - Line %d\n", __LINE__);
+    framework_UnlockMutex(global_dev_lock);
+    printf("\tMutex Unlocked - global_dev_lock - Line %d\n", __LINE__);
     return NULL;
 }
 
@@ -1481,7 +1481,7 @@ int InitEnv()
     eResult tool_res = FRAMEWORK_SUCCESS;
     int res = 0x00;
 
-    tool_res = framework_CreateMutex(&g_devLock);
+    tool_res = framework_CreateMutex(&global_dev_lock);
     if(FRAMEWORK_SUCCESS != tool_res)
     {
         res = 0xFF;
@@ -1489,7 +1489,7 @@ int InitEnv()
 
     if(0x00 == res)
     {
-        tool_res = framework_CreateMutex(&g_SnepClientLock);
+        tool_res = framework_CreateMutex(&global_snep_client_lock);
         if(FRAMEWORK_SUCCESS != tool_res)
         {
             res = 0xFF;
@@ -1498,7 +1498,7 @@ int InitEnv()
 
     if(0x00 == res)
     {
-        tool_res = framework_CreateThread(&g_ThreadHandle, ExitThread, NULL);
+        tool_res = framework_CreateThread(&global_thread_handle, ExitThread, NULL);
         if(FRAMEWORK_SUCCESS != tool_res)
         {
             res = 0xFF;
@@ -1509,23 +1509,23 @@ int InitEnv()
 
 int CleanEnv()
 {
-    if(NULL != g_ThreadHandle)
+    if(NULL != global_thread_handle)
     {
-        framework_JoinThread(g_ThreadHandle);
-        framework_DeleteThread(g_ThreadHandle);
-        g_ThreadHandle = NULL;
+        framework_JoinThread(global_thread_handle);
+        framework_DeleteThread(global_thread_handle);
+        global_thread_handle = NULL;
     }
 
-    if(NULL != g_devLock)
+    if(NULL != global_dev_lock)
     {
-        framework_DeleteMutex(g_devLock);
-        g_devLock = NULL;
+        framework_DeleteMutex(global_dev_lock);
+        global_dev_lock = NULL;
     }
 
-    if(NULL != g_SnepClientLock)
+    if(NULL != global_snep_client_lock)
     {
-        framework_DeleteMutex(g_SnepClientLock);
-        g_SnepClientLock = NULL;
+        framework_DeleteMutex(global_snep_client_lock);
+        global_snep_client_lock = NULL;
     }
     return 0x00;
 }
