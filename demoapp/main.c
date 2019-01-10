@@ -394,16 +394,20 @@ void on_client_device_departure()
     printf("\tSNEP client - onDeviceDeparture return - Line %d\n", __LINE__);
 }
 
-int init_mode(int tag, int p2p, int hce)
+int init_mode(int tag, int p2p, int hce, int snep_server, int snep_client)
 {
     int res = 0x00;
 
-    g_SnepServerCB.onDeviceArrival = on_server_device_arrival;
-    g_SnepServerCB.onDeviceDeparture = on_server_device_departure;
-    g_SnepServerCB.onMessageReceived = on_server_message_received;
+    if(snep_server == 1){
+        g_SnepServerCB.onDeviceArrival = on_server_device_arrival;
+        g_SnepServerCB.onDeviceDeparture = on_server_device_departure;
+        g_SnepServerCB.onMessageReceived = on_server_message_received;
+    }
 
-    g_SnepClientCB.onDeviceArrival = on_client_device_arrival;
-    g_SnepClientCB.onDeviceDeparture = on_client_device_departure;
+    if(snep_client == 1){
+        g_SnepClientCB.onDeviceArrival = on_client_device_arrival;
+        g_SnepClientCB.onDeviceDeparture = on_client_device_departure;
+    }
 
     if(0x00 == res)
     {
@@ -416,7 +420,7 @@ int init_mode(int tag, int p2p, int hce)
 
     if(0x00 == res)
     {
-        if(0x01 == p2p)
+        if(0x01 == p2p && snep_client == 1)
         {
             res = nfcSnep_registerClientCallback(&g_SnepClientCB);
             if(0x00 != res)
@@ -429,7 +433,7 @@ int init_mode(int tag, int p2p, int hce)
     if(0x00 == res)
     {
         nfcManager_enableDiscovery(DEFAULT_NFA_TECH_MASK, 0x00, hce, 1);
-        if(0x01 == p2p)
+        if(0x01 == p2p && snep_server == 1)
         {
             res = nfcSnep_startServer(&g_SnepServerCB);
             if(0x00 != res)
@@ -1375,7 +1379,7 @@ void cmd_poll(int arg_len, char** arg)
     }
     else
     {
-        res = init_mode(0x00, 0x01, 0x00);
+        res = init_mode(0x00, 0x01, 0x00, 1, 1);
 
         if(0x00 == res)
         {
@@ -1408,7 +1412,7 @@ void cmd_push(int arg_len, char** arg)
     }
     else
     {
-        res = init_mode(0x00, 0x01, 0x00);
+        res = init_mode(0x00, 0x01, 0x00, 1, 1);
 
         if(0x00 == res)
         {
