@@ -26,6 +26,7 @@ static void* global_thread_handle = NULL;
 
 static void* global_lock = NULL;
 static int global_present = 0;
+static int global_exit    = 0;
 static nfcSnepServerCallback_t g_SnepServerCB;
 static nfcSnepClientCallback_t g_SnepClientCB;
 
@@ -553,11 +554,14 @@ int wait_device_arrival(int mode, unsigned char* msgToSend, unsigned int len)
 
         while(1){
             int present_dup = 0;
+            int exit_dup = 0;
+
             framework_LockMutex(global_lock);
             present_dup = global_present;
+            exit_dup = global_exit;
             framework_UnlockMutex(global_lock);
 
-            if (present_dup == 2){
+            if (exit_dup == 1){
                 return 0;
             }
             if (present_dup == 1){
@@ -1004,7 +1008,7 @@ void* exit_thread(void* pContext)
 
     getchar();
     framework_LockMutex(global_lock);
-    global_present = 2;
+    global_exit = 1;
     framework_UnlockMutex(global_lock);
 
     return NULL;
