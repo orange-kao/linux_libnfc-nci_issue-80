@@ -474,7 +474,7 @@ void NfcAdaptation::HalDeviceContextCallback (nfc_event_t event, nfc_status_t ev
 void NfcAdaptation::HalDeviceContextDataCallback (uint16_t data_len, uint8_t* p_data)
 {
     const char* func = "NfcAdaptation::HalDeviceContextDataCallback";
-    NXPLOG_API_D ("%s: len=%u", func, data_len);
+//    NXPLOG_API_D ("%s: len=%u", func, data_len);
 #if (NFC_SERVICE_DATA_DEBUG == 0x01)
     phNxpLog_LogBuffer (gLog_level.global_log_level, "\tRecvd", p_data , data_len);
 #endif
@@ -494,7 +494,7 @@ void NfcAdaptation::HalDeviceContextDataCallback (uint16_t data_len, uint8_t* p_
 void NfcAdaptation::HalWrite (UINT16 data_len, UINT8* p_data)
 {
     const char* func = "NfcAdaptation::HalWrite";
-    NXPLOG_API_D ("%s", func);
+//    NXPLOG_API_D ("%s", func);
 #if (NFC_SERVICE_DATA_DEBUG == 0x01)
     phNxpLog_LogBuffer (gLog_level.global_log_level, "\tSend", p_data , data_len);
 #endif
