@@ -31,6 +31,8 @@ extern "C"
     #include "ndef_utils.h"
 }
 
+//#define NFC_SNEP_PUT_DISCONNECT 1
+
 static tNFA_HANDLE sSnepClientHandle = 0;
 static tNFA_HANDLE sSnepClientConnectionHandle = 0;
 static tNFA_STATUS sSnepClientPutState;
@@ -143,6 +145,7 @@ static void nfaSnepClientCallback (tNFA_SNEP_EVT snepEvent, tNFA_SNEP_EVT_DATA *
             else if((sSnepClientConnectionHandle == eventData->put_resp.conn_handle)
                     && (NFA_SNEP_RESP_CODE_UNSUPP_VER == eventData->put_resp.resp_code))
             {
+                NXPLOG_API_D ("%s: NXP workaround - Line %d.", __FUNCTION__, __LINE__);
                 nativeNfcSnep_doPutCompleted (NFA_STATUS_OK);  //workaround need to fix later
             }
             else
@@ -204,7 +207,7 @@ static void nfaSnepServerCallback (tNFA_SNEP_EVT snepEvent, tNFA_SNEP_EVT_DATA *
             }
             break;
 
-        case NFA_SNEP_DISC_EVT:
+        case NFA_SNEP_DISC_EVT: // 8
             NXPLOG_API_D ("%s: NFA_SNEP_DISC_EVT: Server Connection/Register Handle: 0x%04x\n", __FUNCTION__, eventData->disc.conn_handle);
             if(sSnepServerConnectionHandle == eventData->disc.conn_handle)
             {
@@ -262,8 +265,11 @@ static void *snepServerThread(void *arg)
         sNfaSnepServerPutRspEvent.wait();
         if (sSnepServerConnectionHandle == 0)
             break;
-        if(NFA_STATUS_OK != NFA_SnepPutResponse(sSnepServerConnectionHandle, sNfaSnepRespCode))
+        if(NFA_STATUS_OK == NFA_SnepPutResponse(sSnepServerConnectionHandle, sNfaSnepRespCode))
         {
+            NXPLOG_API_D ("%s: send response succeed.", __FUNCTION__);
+        }
+        else{
             NXPLOG_API_D ("%s: send response failed.", __FUNCTION__);
         }
     }
@@ -350,8 +356,7 @@ void nativeNfcSnep_abortClientWaits()
     {
         SyncEventGuard g (sNfaSnepClientConnEvent);
         sNfaSnepClientConnEvent.notifyOne ();
-    }
-    {
+    } {
         SyncEventGuard g (sNfaSnepClientDisconnEvent);
         sNfaSnepClientDisconnEvent.notifyOne ();
     }
@@ -607,6 +612,7 @@ INT32 nativeNfcSnep_putMessage(UINT8* msg, UINT32 length)
         NXPLOG_API_E ("%s: not NDEF message", __FUNCTION__);
         return NFA_STATUS_FAILED;
     }
+    NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
     gSyncMutex.lock();
     if (!nativeNfcManager_isNfcActive())
     {
@@ -614,48 +620,60 @@ INT32 nativeNfcSnep_putMessage(UINT8* msg, UINT32 length)
         status = NFA_STATUS_FAILED;
         goto clean_and_return;
     }
+    NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
 #if (NFC_SNEP_PUT_DISCONNECT == 1)
     if (sSnepClientHandle)
 #else
     if ((sSnepClientHandle) && (sSnepClientConnectionHandle == 0))
 #endif
 	{
+        NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
         SyncEventGuard guard (sNfaSnepClientConnEvent);
         if(NFA_STATUS_OK != NFA_SnepConnect(sSnepClientHandle, SNEP_SERVER_NAME))
         {
+            NXPLOG_API_D ("%s: NFA_SnepConnect NOK", __FUNCTION__);
             status = NFA_STATUS_FAILED;
             goto clean_and_return;
         }
         sNfaSnepClientConnEvent.wait();
     }
 
+    NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
     /* Send Put Request */
     if (sSnepClientConnectionHandle != 0)
     {
+        NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
         SyncEventGuard guard (sNfaSnepClientPutMsgEvent);
         if(NFA_STATUS_OK != NFA_SnepPut (sSnepClientConnectionHandle, length, msg))
         {
+            NXPLOG_API_E ("%s: NFA_SnepPut NOK", __FUNCTION__);
             status = NFA_STATUS_FAILED;
             goto clean_and_return;
         }
+        NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
         sNfaSnepClientPutMsgEvent.wait();
         if (sSnepClientPutState != NFA_STATUS_OK)
         {
+            NXPLOG_API_E ("%s: sSnepClientPutState NOK", __FUNCTION__);
             status = NFA_STATUS_FAILED;
         }
         else
         {
-            status = NFA_STATUS_OK;
-            sSnepClientPutState = NFA_STATUS_FAILED;
+            NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
+            status = NFA_STATUS_OK; // Successful push
+//            sSnepClientPutState = NFA_STATUS_FAILED; // this would be on reason makes later push fail
         }
     }
+    NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
 #if (NFC_SNEP_PUT_DISCONNECT == 1)
+    NXPLOG_API_D ("%s: Line %d. status: %d", __FUNCTION__, __LINE__, status);
     /* Disconnect from Snep Server */
     if (sSnepClientConnectionHandle != 0)
     {
         SyncEventGuard guard (sNfaSnepClientDisconnEvent);
         if(NFA_STATUS_OK != NFA_SnepDisconnect (sSnepClientConnectionHandle, 0x01))
         {
+            NXPLOG_API_E ("%s: NFA_SnepDisconnect NOK", __FUNCTION__);
             status = NFA_STATUS_FAILED;
             goto clean_and_return;
         }
